@@ -14,12 +14,27 @@ unordered_map<string, string> opcodeMap = {
 
 // Map for registers
 unordered_map<string, string> registerMap = {
-    {"$zero", "0000"}, {"$t0", "0101"}, {"$t1", "0100"}, {"$t2", "0011"}, {"$t3", "0010"}, {"$t4", "0001"}, {"$sp", "0110"}};
+    {"$zero", "0000"}, {"$t1", "0001"}, {"$t2", "0010"}, {"$t3", "0011"}, {"$t4", "0100"}, {"$t0", "0101"}, {"$sp", "0110"}};
 
 // Function to convert immediate/address values to binary
 string toBinary(int value, int bits)
 {
     return bitset<16>(value).to_string().substr(16 - bits, bits);
+}
+
+string binaryToTwosComplement(string binary)
+{
+    bool foundOne = false;
+    for (int i = binary.length() - 1; i >= 0; i--)
+    {
+        if (binary[i] == '1' && !foundOne)
+        {
+            foundOne = true;
+            continue;
+        }
+        binary[i] = (binary[i] == '0') ? '1' : '0';
+    }
+    return binary;
 }
 
 // Function to convert binary string to hexadecimal string
@@ -31,8 +46,10 @@ string binaryToHex(const string &binary)
     return ss.str();
 }
 
+unordered_map<string, int> labelMap;
+
 // Function to parse and convert assembly instruction to binary
-string convertToBinary(const string &line)
+string convertToBinary(const string &line, int lineNumber)
 {
     stringstream ss(line);
     string instruction, rd, rs, rt, imm, jumpAddress, shiftAmt;
@@ -41,12 +58,27 @@ string convertToBinary(const string &line)
     // Identify instruction type based on opcode
     string opcode = opcodeMap[instruction];
     string binaryInstruction;
-
-    if (instruction == "j")
+    
+    // a comment start with #
+    if (instruction[0] == '#') 
+    {
+        cerr << "COMMENT " << line << endl;
+    }
+    else if (instruction == "j")
     {
         // J-type: Opcode + Address
+        // two possiblity either a number was given or a label
         ss >> jumpAddress;
-        int address = stoi(jumpAddress);
+        int address;
+        if (isdigit(jumpAddress[0])) 
+        {
+            address = stoi(jumpAddress);
+        }
+        else 
+        {
+            address = labelMap[jumpAddress];
+        }
+
         binaryInstruction = opcode + toBinary(address, 8) + "00000000";
 
         cerr << "JMP " << opcode << " " << toBinary(address, 8) << " " << "00000000" << endl;
@@ -78,10 +110,37 @@ string convertToBinary(const string &line)
     {
         // I-type: Opcode + rs + rt + Immediate
         ss >> rt >> rs >> imm;
+        
         int immediate = stoi(imm);
         binaryInstruction = opcode + registerMap[rs] + registerMap[rt] + toBinary(immediate, 8);
     
         cerr << "IMM " << opcode << " " << registerMap[rs] << " " << registerMap[rt] << " " << toBinary(immediate, 8) << endl;
+    }
+    else if(instruction == "beq" || instruction == "bneq")
+    {
+        // BRANCH I TYPE
+        // I-type: Opcode + rs + rt + Immediate
+        ss >> rt >> rs >> imm;
+        // imm is a label or a address if number
+        int address = labelMap[imm];
+        
+        // calculate the offset
+        int offset = address - lineNumber - 1;
+        if(offset < 0) offset = 256 + offset;
+
+        binaryInstruction = opcode + registerMap[rs] + registerMap[rt] + toBinary(offset, 8);
+        cerr << "BRANCH " << opcode << " " << registerMap[rs] << " " << registerMap[rt] << " " << toBinary(offset, 8) << endl;
+        return binaryInstruction;
+    }
+    else {
+        // LABEL
+        // LABEL: Opcode + Address
+        string label = instruction;
+        label.pop_back();
+        labelMap[label] = lineNumber;
+        cerr << "LABEL " << label << " " << lineNumber << endl;
+
+        return "";
     }
 
     return binaryInstruction;
@@ -90,15 +149,19 @@ string convertToBinary(const string &line)
 
 int main()
 {
-    string filename = "REGISTER_DEMO.txt";
+    string path = "D://CSE_CourseMaterials//CSES 210 - ARCHITECTURE SESSIONAL//MIPS_Assignment_03//ASSEMBLY//";
+    string binaryPath = "D://CSE_CourseMaterials//CSES 210 - ARCHITECTURE SESSIONAL//MIPS_Assignment_03//BINARY//";
+    
+    string filename = "FULLSET_OPCODE_TEST.mips";
+    // string filename = "REGISTER_DEMO.mips";
 
-    string inputFileName = "";
-    inputFileName += "ASSEMBLY_";
+    string inputFileName = path;
     inputFileName += filename;
 
-    string outputFilename = "";
-    outputFilename += "BINARY_";
-    outputFilename += filename;
+    string outputFilename = binaryPath;
+    outputFilename += "BIN_";
+    outputFilename += filename.substr(0, filename.find("."));
+    outputFilename += ".txt";
 
     ifstream inputFile(inputFileName);
     ofstream outputFile(outputFilename);
@@ -112,13 +175,16 @@ int main()
     outputFile << "v2.0 raw" << endl; // Set output file format to raw
 
     string line;
+    int lineNumber = 0;
     while (getline(inputFile, line))
     {
         if (line.empty() || line == "\n") continue;
-        string binary = convertToBinary(line);
+        string binary = convertToBinary(line, lineNumber);
+        if(binary.empty() || binary == "") continue;
         string hexValue = binaryToHex(binary); // Convert binary to hexadecimal
         outputFile << hexValue << endl; // Save hexadecimal value to file
         // cerr << binary << endl; // Print binary value to console
+        lineNumber++;
     }
 
     inputFile.close();
