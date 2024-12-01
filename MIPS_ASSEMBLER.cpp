@@ -110,8 +110,13 @@ string convertToBinary(const string &line, int lineNumber)
     {
         // I-type: Opcode + rs + rt + Immediate
         ss >> rt >> rs >> imm;
-        
         int immediate = stoi(imm);
+
+        if(immediate < 0) 
+        {
+            immediate = immediate + 512;
+        }
+
         binaryInstruction = opcode + registerMap[rs] + registerMap[rt] + toBinary(immediate, 8);
     
         cerr << "IMM " << opcode << " " << registerMap[rs] << " " << registerMap[rt] << " " << toBinary(immediate, 8) << endl;

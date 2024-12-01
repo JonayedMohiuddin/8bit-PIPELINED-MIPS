@@ -574,9 +574,8 @@
     <comp lib="4" loc="(500,190)" name="ROM">
       <a name="dataWidth" val="20"/>
       <a name="contents">addr/data: 8 20
-a0503 a0104 a0205 a030c a0407 a0608 3240 4140
-12501 15501 22101 21101 32302 33304 41530 44330
-a05b3 a012e 65120 63220 715f7 c1020 712f5
+a0503 a0104 a0205 a030c a0407 a0608 93203 94211
+a2203 a4311 b3301 b4402 c3440 c5130 e3420 e5130
 </a>
     </comp>
     <comp lib="0" loc="(640,310)" name="Splitter">
@@ -787,7 +786,7 @@ a05b3 a012e 65120 63220 715f7 c1020 712f5
       <a name="dataWidth" val="12"/>
       <a name="contents">addr/data: 4 12
 901 506 503 502 904 11 903 21
-e40 501 500 505 900 580 902 8
+c40 501 500 505 900 780 902 8
 </a>
     </comp>
     <comp lib="0" loc="(270,180)" name="Pin">

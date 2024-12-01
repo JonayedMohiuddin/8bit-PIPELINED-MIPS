@@ -45,6 +45,33 @@ beq $t0 $t1 here # 179 == 46 then jump to here
 # beq $t2 $t1 here
 
 # sw test [sw saves register value to memory]
-sw $t2 $zero 0 # save 38 to memory address 0
-sw $t3 $zero 4 # save 7 to memory address 4
+sw $t0 $zero 0 # save 38 to memory address 0
+sw $t1 $zero 4 # save 7 to memory address 4
+
+# subi test
+subi $t2 $t3 3 
+subi $t2 $t4 17 
+
+# addi test 
+addi $t2 $t2 3
+addi $t3 $t4 17
+
+# sll test 
+sll $t3 $t3 1
+sll $t4 $t4 2 
+
+# add test 
+add $t4 $t3 $t4 
+add $t3 $t0 $t1 
+
+# lw test [lw loads memory value to register]
+sw $t3 $zero 0 # save 7 to memory address 0
+sw $t4 $t3 -4 # save 76 to memory address 7 - 4 = 3
+lw $t0 $zero 0 # load 7 from memory address 0 to $t0
+lw $t1 $t3 -4 # load 76 from memory address 3 to $t1
+
+# or test 
+or $t2 $t3 $t4
+or $t3 $t0 $t1 
+
 
