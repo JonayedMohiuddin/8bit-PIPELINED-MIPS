@@ -1,3 +1,0 @@
-Added display perihperal device with internal buffer and register memory. 
-Perihperal can be added to the mips by mapping some of the memory to output and input perihperal. 
-Also by using two register to map to the start of the perihperal addresses.

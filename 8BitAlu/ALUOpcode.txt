@@ -6,7 +6,7 @@ Opcode in hexadecimal value : Operation
 0x2 : A | B //or
 0x3 : A & B //and
 0x4 : ~(A | B) //nor
-0x5 : B << A //sll
-0x6 : B >>> A //srl
-0x7 : B >> A //sra
+0x5 : A << B  //sll
+0x6 : A >>> B //srl
+0x7 : B >> A  //sra
 

@@ -157,7 +157,7 @@ int main()
     string path = "D://CSE_CourseMaterials//CSES 210 - ARCHITECTURE SESSIONAL//MIPS_Assignment_03//ASSEMBLY//";
     string binaryPath = "D://CSE_CourseMaterials//CSES 210 - ARCHITECTURE SESSIONAL//MIPS_Assignment_03//BINARY//";
     
-    string filename = "FULLSET_OPCODE_TEST.mips";
+    string filename = "SHIFTING_DEMO.mips";
     // string filename = "REGISTER_DEMO.mips";
 
     string inputFileName = path;
