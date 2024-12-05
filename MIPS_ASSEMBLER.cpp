@@ -16,6 +16,9 @@ unordered_map<string, string> opcodeMap = {
 unordered_map<string, string> registerMap = {
     {"$zero", "0000"}, {"$t1", "0001"}, {"$t2", "0010"}, {"$t3", "0011"}, {"$t4", "0100"}, {"$t0", "0101"}, {"$sp", "0110"}};
 
+// Map for labels
+unordered_map<string, int> labelMap;
+
 // Function to convert immediate/address values to binary
 string toBinary(int value, int bits)
 {
@@ -46,7 +49,15 @@ string binaryToHex(const string &binary)
     return ss.str();
 }
 
-unordered_map<string, int> labelMap;
+void checkValidRegister(const string &reg)
+{
+    if (registerMap.find(reg) == registerMap.end())
+    {
+        cerr << "Invalid register: " << reg << endl;
+        cerr << "Exiting program..." << endl;
+        exit(1);
+    }
+}
 
 // Function to parse and convert assembly instruction to binary
 string convertToBinary(const string &line, int lineNumber)
@@ -89,20 +100,29 @@ string convertToBinary(const string &line, int lineNumber)
         // NORMAL R TYPE
         // R-type: Opcode + rs + rt + rd + shift
         ss >> rd >> rs >> rt;
+
+        checkValidRegister(rs);
+        checkValidRegister(rt);
+        checkValidRegister(rd);
+
         binaryInstruction = opcode + registerMap[rs] + registerMap[rt] + registerMap[rd] + "0000";
 
-        cerr << "ALU " << opcode << " " << registerMap[rs] << " " << registerMap[rt] << " " << registerMap[rd] << " " << "0000" << endl;
+        cerr << instruction << " " << opcode << " " << registerMap[rs] << " " << registerMap[rt] << " " << registerMap[rd] << " " << "0000" << endl;
     }
     else if (instruction == "srl" || instruction == "sll")
     {
         // SHIFT R TYPE
         // R-type: Opcode + rs + rt + rd + shift
         ss >> rd >> rt >> shiftAmt;
+
+        checkValidRegister(rt);
+        checkValidRegister(rd);
+
         int shiftAmount = stoi(shiftAmt);
         // WHEN SHIFTING USE RS AS NUMBER , RT AS DESTINATION REGISTER , SHIFT AMOUNT AS SHIFT AMOUNT
         binaryInstruction = opcode + registerMap[rt] + registerMap[rd] + toBinary(shiftAmount, 8);
 
-        cerr << "SHI " << opcode << " " << registerMap[rt] << " " << registerMap[rd] << " " << toBinary(shiftAmount, 8) << endl;
+        cerr << instruction << " " << opcode << " " << registerMap[rt] << " " << registerMap[rd] << " " << toBinary(shiftAmount, 8) << endl;
     }
     else if(instruction == "lw"   || instruction == "sw"   || 
             instruction == "addi" || instruction == "subi" || 
@@ -112,6 +132,9 @@ string convertToBinary(const string &line, int lineNumber)
         ss >> rt >> rs >> imm;
         int immediate = stoi(imm);
 
+        checkValidRegister(rs);
+        checkValidRegister(rt);
+
         if(immediate < 0) 
         {
             immediate = immediate + 512;
@@ -119,7 +142,7 @@ string convertToBinary(const string &line, int lineNumber)
 
         binaryInstruction = opcode + registerMap[rs] + registerMap[rt] + toBinary(immediate, 8);
     
-        cerr << "IMM " << opcode << " " << registerMap[rs] << " " << registerMap[rt] << " " << toBinary(immediate, 8) << endl;
+        cerr << instruction << " " << opcode << " " << registerMap[rs] << " " << registerMap[rt] << " " << toBinary(immediate, 8) << endl;
     }
     else if(instruction == "beq" || instruction == "bneq")
     {
@@ -128,13 +151,16 @@ string convertToBinary(const string &line, int lineNumber)
         ss >> rt >> rs >> imm;
         // imm is a label or a address if number
         int address = labelMap[imm];
+
+        checkValidRegister(rs);
+        checkValidRegister(rt);
         
         // calculate the offset
         int offset = address - lineNumber - 1;
         if(offset < 0) offset = 256 + offset;
 
         binaryInstruction = opcode + registerMap[rs] + registerMap[rt] + toBinary(offset, 8);
-        cerr << "BRANCH " << opcode << " " << registerMap[rs] << " " << registerMap[rt] << " " << toBinary(offset, 8) << endl;
+        cerr << instruction << " " << opcode << " " << registerMap[rs] << " " << registerMap[rt] << " " << toBinary(offset, 8) << endl;
         return binaryInstruction;
     }
     else {
@@ -157,7 +183,7 @@ int main()
     string path = "D://CSE_CourseMaterials//CSES 210 - ARCHITECTURE SESSIONAL//MIPS_Assignment_03//ASSEMBLY//";
     string binaryPath = "D://CSE_CourseMaterials//CSES 210 - ARCHITECTURE SESSIONAL//MIPS_Assignment_03//BINARY//";
     
-    string filename = "SHIFTING_DEMO.mips";
+    string filename = "PIPELINE_BASIC_TEST.mips";
     // string filename = "REGISTER_DEMO.mips";
 
     string inputFileName = path;
