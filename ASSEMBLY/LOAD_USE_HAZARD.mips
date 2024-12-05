@@ -1,6 +1,6 @@
 # TEST 1 : Load-Use Hazard 
 # Hazard Detection : Success
-# Stall            : Failed
+# Stall            : Success
 addi $t0 $zero -10
 sw $t0 $zero 0
 addi $t0 $zero 10
