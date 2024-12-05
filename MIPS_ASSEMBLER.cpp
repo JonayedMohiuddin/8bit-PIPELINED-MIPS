@@ -183,7 +183,7 @@ int main()
     string path = "D://CSE_CourseMaterials//CSES 210 - ARCHITECTURE SESSIONAL//MIPS_Assignment_03//ASSEMBLY//";
     string binaryPath = "D://CSE_CourseMaterials//CSES 210 - ARCHITECTURE SESSIONAL//MIPS_Assignment_03//BINARY//";
     
-    string filename = "PIPELINE_BASIC_TEST.mips";
+    string filename = "PIPELINE_DATA_HAZARD_TEST.mips";
     // string filename = "REGISTER_DEMO.mips";
 
     string inputFileName = path;
@@ -226,17 +226,58 @@ int main()
     return 0;
 }
 
-/*
+// compile all assembly in directory
 
-addi $t0 $zero 10
-addi $t1 $zero 20
-sw   $t0 $zero 0
-sw   $t1 $zero 1 
-lw   $t0 $zero 0
-lw   $t1 $zero 1
-add  $t0 $t1 $t2
-sll  $t2 $t2 1
-sw   $t2 $zero 2 
-j    0
+// int main()
+// {
+//     string path = "D://CSE_CourseMaterials//CSES 210 - ARCHITECTURE SESSIONAL//MIPS_Assignment_03//ASSEMBLY//";
+//     string binaryPath = "D://CSE_CourseMaterials//CSES 210 - ARCHITECTURE SESSIONAL//MIPS_Assignment_03//BINARY//";
 
-*/
+//     // Iterate through all files in the ASSEMBLY directory
+//     for (const auto& entry : fs::directory_iterator(path))
+//     {
+//         if (entry.is_regular_file()) // Ensure it is a regular file
+//         {
+//             string filename = entry.path().filename().string(); // Get the filename
+//             string inputFileName = entry.path().string();       // Full input file path
+
+//             // Construct the output filename
+//             string outputFilename = binaryPath;
+//             outputFilename += "BIN_";
+//             outputFilename += filename.substr(0, filename.find("."));
+//             outputFilename += ".txt";
+
+//             ifstream inputFile(inputFileName);
+//             ofstream outputFile(outputFilename);
+
+//             if (!inputFile.is_open() || !outputFile.is_open())
+//             {
+//                 cerr << "Error opening file: " << filename << endl;
+//                 continue; // Skip this file and proceed to the next
+//             }
+
+//             outputFile << "v2.0 raw" << endl; // Set output file format to raw
+
+//             string line;
+//             int lineNumber = 0;
+//             while (getline(inputFile, line))
+//             {
+//                 if (line.empty() || line == "\n") continue;
+//                 string binary = convertToBinary(line, lineNumber);
+//                 if (binary.empty() || binary == "") continue;
+//                 string hexValue = binaryToHex(binary); // Convert binary to hexadecimal
+//                 outputFile << hexValue << endl;       // Save hexadecimal value to file
+//                 lineNumber++;
+//             }
+
+//             inputFile.close();
+//             outputFile.close();
+
+//             cout << "Converted file: " << filename << " -> " << outputFilename << endl;
+//         }
+//     }
+
+//     cout << "Conversion complete for all files in the directory." << endl;
+
+//     return 0;
+// }
