@@ -1,17 +1,9 @@
-#include <iostream>
-#include <fstream>
-#include <sstream>
-#include <unordered_map>
-#include <vector>
-#include <bitset>
-#include <algorithm>
-#include <iomanip> // For formatting hexadecimal output
-
+#include <bits/stdc++.h>
 using namespace std;
 
 // Map for opcodes
 unordered_map<string, string> opcodeMap = {
-    {"sub", "0000"}, {"srl", "0001"}, {"andi", "0010"}, {"ori", "0011"}, {"nor", "0100"}, {"bneq", "0101"}, {"and", "0110"}, {"beq", "0111"}, {"sw", "1000"}, {"subi", "1001"}, {"addi", "1010"}, {"sll", "1011"}, {"add", "1100"}, {"lw", "1101"}, {"or", "1110"}, {"j", "1111"}};
+    {"sub", "0000"}, {"srl", "0001"}, {"andi", "0010"}, {"ori", "0011"}, {"nor", "0100"}, {"bneq", "0101"}, {"and", "0110"}, {"beq", "0111"}, {"sw", "1000"}, {"subi", "1001"}, {"addi", "1010"}, {"sll", "1011"}, {"add", "1100"}, {"lw", "1101"}, {"or", "1110"}, {"j", "1111"}, {"nop", "0000"}};
 
 // Map for registers
 unordered_map<string, string> registerMap = {
@@ -20,67 +12,8 @@ unordered_map<string, string> registerMap = {
 // Map for labels
 unordered_map<string, int> labelMap;
 
+string nop_binary = opcodeMap["nop"] + registerMap["$zero"] + registerMap["$zero"] + registerMap["$zero"] + "0000";
 
-// Function to remove all commas from a string
-string removeCommas(const string &str)
-{
-    string result = str;
-    result.erase(remove(result.begin(), result.end(), ','), result.end());
-    return result;
-}
-
-// function to get the line number of labels
-int updateLabels(const string &line, int lineNumber)
-{
-    string cleanLine = removeCommas(line);
-    stringstream ss(cleanLine);
-    string instruction;
-    ss >> instruction;
-
-    int val = 1;
-
-    if (instruction[0] == '#' || opcodeMap.find(instruction) == registerMap.end())
-    {
-        // LABEL
-        string label = instruction;
-        label.pop_back();
-        labelMap[label] = lineNumber;
-        cerr << "LABEL " << label << " " << lineNumber << endl;
-
-        val = 0;
-    }
-    return val;
-}
-
-// Function to convert immediate/address values to binary
-string toBinary(int value, int bits)
-{
-    return bitset<16>(value).to_string().substr(16 - bits, bits);
-}
-
-string binaryToTwosComplement(string binary)
-{
-    bool foundOne = false;
-    for (int i = binary.length() - 1; i >= 0; i--)
-    {
-        if (binary[i] == '1' && !foundOne)
-        {
-            foundOne = true;
-            continue;
-        }
-        binary[i] = (binary[i] == '0') ? '1' : '0';
-    }
-    return binary;
-}
-
-// Function to convert binary string to hexadecimal string
-string binaryToHex(const string &binary)
-{
-    stringstream ss;
-    unsigned long decimalValue = bitset<32>(binary).to_ulong(); // Convert binary to decimal
-    ss << hex /* << uppercase */ << setw(binary.length() / 4) << setfill('0') << decimalValue; // Convert decimal to hex
-    return ss.str();
-}
 
 void checkValidRegister(const string &reg)
 {
@@ -92,28 +25,132 @@ void checkValidRegister(const string &reg)
     }
 }
 
-// Function to parse and convert assembly instruction to binary
-string convertToBinary(const string &line, int lineNumber)
+void checkValidLabel(const string &label)
 {
-    string cleanLine = removeCommas(line);
-    stringstream ss(cleanLine);
-    string instruction, rd, rs, rt, imm, jumpAddress, shiftAmt;
-    ss >> instruction;
-
-    // Identify instruction type based on opcode
-    string opcode = opcodeMap[instruction];
-    string binaryInstruction;
-    
-    // a comment start with #
-    if (instruction[0] == '#') 
+    if (labelMap.find(label) == labelMap.end())
     {
-        cerr << "COMMENT " << line << endl;
+        cerr << "Invalid label: " << label << endl;
+        cerr << "Exiting program..." << endl;
+        exit(1);
     }
-    else if (instruction == "j")
+}
+
+string toBinary(int value, int bits)
+{
+    return bitset<16>(value).to_string().substr(16 - bits, bits);
+}
+
+string binaryToHex(const string &binary)
+{
+    stringstream ss;
+    unsigned long decimalValue = bitset<32>(binary).to_ulong(); // Convert binary to decimal
+    ss << hex /* << uppercase */ << setw(binary.length() / 4) << setfill('0') << decimalValue; // Convert decimal to hex
+    return ss.str();
+}
+
+vector<string> readFile(string filename)
+{
+    vector<string> lines;
+    ifstream file(filename);
+    string line;
+    
+    while (getline(file, line))
     {
+        if (!line.empty() && line[0] != '#')
+        {
+            lines.push_back(line);
+        }
+    }
+
+    return lines;
+}
+
+vector<string> tokenizer(string line)
+{
+    vector<string> tokens;
+    string token = "";
+
+    for (char ch : line)
+    {
+        if (isspace(ch) || ch == ',' || ch == '(' || ch == ')')
+        {
+            if (!token.empty())
+            {
+                tokens.push_back(token);
+                token.clear();
+            }
+            // Add the delimiter itself as a separate token if it's not a space
+            if (ch == '(' || ch == ')')
+            {
+                tokens.push_back(string(1, ch));
+            }
+        }
+        else if(ch == '#')
+        {
+            break;
+        }
+        else
+        {
+            // Build the current token
+            token += ch;
+        }
+    }
+
+    // Add the last token if any
+    if (!token.empty())
+    {
+        tokens.push_back(token);
+    }
+
+    return tokens;
+}
+
+void filter(vector<string> lines)
+{
+    // do nothing for now
+}
+
+void updateLabelMaps(vector<string> lines)
+{
+    int lineNumber = 0;
+    for (string line : lines)
+    {
+        vector<string> tokens = tokenizer(line);
+        if (tokens[0].size() > 0 && tokens[0].back() == ':')
+        {
+            string label = tokens[0].substr(0, tokens[0].size() - 1);
+            labelMap[label] = lineNumber;
+        }
+        else
+        {
+            lineNumber++;
+        }
+    }
+}
+
+string getBinary(vector<string> tokens, int lineNumber)
+{
+    string opcode = opcodeMap[tokens[0]];
+    string binary = "";
+
+    if(opcode == "nop")
+    {
+        // NOP : sub $zero, $zero, $zer
+        binary = nop_binary;
+        cerr << opcode << " " << registerMap["$zero"] << " " << registerMap["$zero"] << " " << registerMap["$zero"] << " " << "0000" << endl;
+    }
+    else if (tokens[0] == "j")
+    {
+        if(tokens.size() < 2)
+        {
+            cerr << "!! Invalid number of arguments for j instruction." << endl;
+            exit(1);
+        }
         // J-type: Opcode + Address
+        // Input Structure: j jumpAddress [label or number]
+        string jumpAddress = tokens[1];
+
         // two possiblity either a number was given or a label
-        ss >> jumpAddress;
         int address;
         if (isdigit(jumpAddress[0])) 
         {
@@ -124,116 +161,150 @@ string convertToBinary(const string &line, int lineNumber)
             address = labelMap[jumpAddress];
         }
 
-        binaryInstruction = opcode + toBinary(address, 8) + "00000000";
-
+        binary = opcode + toBinary(address, 8) + "00000000";
+        
         cerr << "JMP " << opcode << " " << toBinary(address, 8) << " " << "00000000" << endl;
     }
-    else if (instruction == "sub" || instruction == "and" || instruction == "or" || 
-             instruction == "nor" || instruction == "add") 
+    else if (tokens[0] == "sub" || tokens[0] == "and" || tokens[0] == "or" || 
+             tokens[0] == "nor" || tokens[0] == "add") 
     {
         // NORMAL R TYPE
         // R-type: Opcode + rs + rt + rd + shift
-        ss >> rd >> rs >> rt;
+        // Input Structure: sub rd, rs, rt
+        if(tokens.size() < 4)
+        {
+            cerr << "!! Invalid number of arguments for " << tokens[0] << " instruction." << endl;
+            exit(1);
+        }
+        string rd = tokens[1];
+        string rs = tokens[2];
+        string rt = tokens[3];
 
         checkValidRegister(rs);
         checkValidRegister(rt);
         checkValidRegister(rd);
 
-        binaryInstruction = opcode + registerMap[rs] + registerMap[rt] + registerMap[rd] + "0000";
+        binary = opcode + registerMap[rs] + registerMap[rt] + registerMap[rd] + "0000";
 
-        cerr << instruction << " " << opcode << " " << registerMap[rs] << " " << registerMap[rt] << " " << registerMap[rd] << " " << "0000" << endl;
+        cerr << tokens[0] << " " << opcode << " " << registerMap[rs] << " " << registerMap[rt] << " " << registerMap[rd] << " " << "0000" << endl;
     }
-    else if (instruction == "srl" || instruction == "sll")
+    else if (tokens[0] == "srl" || tokens[0] == "sll")
     {
         // SHIFT R TYPE
         // R-type: Opcode + rs + rt + rd + shift
-        ss >> rd >> rt >> shiftAmt;
+        // Input Structure: srl rd, rt, shiftAmt
+        if(tokens.size() < 4)
+        {
+            cerr << "!! Invalid number of arguments for " << tokens[0] << " instruction." << endl;
+            exit(1);
+        }
+
+        string rd = tokens[1];
+        string rt = tokens[2];
+        string shiftAmt = tokens[3];
 
         checkValidRegister(rt);
         checkValidRegister(rd);
 
         int shiftAmount = stoi(shiftAmt);
-        // WHEN SHIFTING USE RS AS NUMBER , RT AS DESTINATION REGISTER , SHIFT AMOUNT AS SHIFT AMOUNT
-        binaryInstruction = opcode + registerMap[rt] + registerMap[rd] + toBinary(shiftAmount, 8);
 
-        cerr << instruction << " " << opcode << " " << registerMap[rt] << " " << registerMap[rd] << " " << toBinary(shiftAmount, 8) << endl;
+        // WHEN SHIFTING USE RS AS NUMBER , RT AS DESTINATION REGISTER , SHIFT AMOUNT AS SHIFT AMOUNT
+        binary = opcode + registerMap[rt] + registerMap[rd] + toBinary(shiftAmount, 8);
+
+        cerr << tokens[0] << " " << opcode << " " << registerMap[rt] << " " << registerMap[rd] << " " << toBinary(shiftAmount, 8) << endl;
     }
-    else if(instruction == "addi" || instruction == "subi" || 
-            instruction == "andi" || instruction == "ori")
+    else if(tokens[0] == "addi" || tokens[0] == "subi" || 
+            tokens[0] == "andi" || tokens[0] == "ori")
     {
         // I-type: Opcode + rs + rt + Immediate
-        ss >> rt >> rs >> imm;
+        // Input Structure: addi rt, rs, imm
+        if(tokens.size() < 4)
+        {
+            cerr << "!! Invalid number of arguments for " << tokens[0] << " instruction." << endl;
+            exit(1);
+        }
+
+        string rt = tokens[1];
+        string rs = tokens[2];
+        string imm = tokens[3];
+
+        checkValidRegister(rs);
+        checkValidRegister(rt);
+
         int immediate = stoi(imm);
 
-        checkValidRegister(rs);
-        checkValidRegister(rt);
+        binary = opcode + registerMap[rs] + registerMap[rt] + toBinary(immediate, 8);
 
-        binaryInstruction = opcode + registerMap[rs] + registerMap[rt] + toBinary(immediate, 8);
-    
-        cerr << instruction << " " << opcode << " " << registerMap[rs] << " " << registerMap[rt] << " " << toBinary(immediate, 8) << endl;
+        cerr << tokens[0] << " " << opcode << " " << registerMap[rs] << " " << registerMap[rt] << " " << toBinary(immediate, 8) << endl;
     }
-    else if(instruction == "lw" || instruction == "sw")
+    else if(tokens[0] == "lw" || tokens[0] == "sw")
     {
         // Updated I-type format for lw/sw: Opcode + rs + rt + Immediate
-        ss >> rt; // Get the destination register (e.g., $t0)
+        // Input Structure: lw rt, offset(rs)
+        // TOKENS INCLUDE PARANTHESIS ALSO
+        if(tokens.size() < 5)
+        {
+            cerr << "!! Invalid number of arguments for " << tokens[0] << " instruction." << endl;
+            exit(1);
+        }
+
+        string rt = tokens[1]; // Get the destination register (e.g., $t0)
+        string imm = tokens[2]; // Get the offset (e.g., 4)
+        string rs = tokens[4]; // Get the source register (e.g., $t1)
+
         checkValidRegister(rt);
-
-        string offsetAndSrc; // Format: offset($src_register)
-        ss >> offsetAndSrc;
-
-        // Extract offset and source register
-        size_t parenPos = offsetAndSrc.find('(');
-        int immediate = stoi(offsetAndSrc.substr(0, parenPos)); // Extract offset before '('
-        string rs = offsetAndSrc.substr(parenPos + 1, offsetAndSrc.length() - parenPos - 2); // Extract register inside '()'
-
         checkValidRegister(rs);
 
-        binaryInstruction = opcode + registerMap[rs] + registerMap[rt] + toBinary(immediate, 8);
+        int immediate = stoi(imm);
 
-        cerr << instruction << " " << opcode << " " << registerMap[rs] << " " << registerMap[rt] << " " << toBinary(immediate, 8) << endl;
+        // binaryInstruction = opcode + registerMap[rs] + registerMap[rt] + toBinary(immediate, 8);
+        binary = opcode + registerMap[rs] + registerMap[rt] + toBinary(immediate, 8);
+
+        cerr << tokens[0] << " " << opcode << " " << registerMap[rs] << " " << registerMap[rt] << " " << toBinary(immediate, 8) << endl;
     }
-    else if(instruction == "beq" || instruction == "bneq")
+    else if(tokens[0] == "beq" || tokens[0] == "bneq")
     {
         // BRANCH I TYPE
         // I-type: Opcode + rs + rt + Immediate
-        ss >> rt >> rs >> imm;
-        // imm is a label or a address if number
-        int address = labelMap[imm];
+        // Input Structure: beq rt, rs, label
+        if(tokens.size() < 4)
+        {
+            cerr << "!! Invalid number of arguments for " << tokens[0] << " instruction." << endl;
+            exit(1);
+        }
 
+        string rt = tokens[1];
+        string rs = tokens[2];
+        string label = tokens[3];
+ 
         checkValidRegister(rs);
         checkValidRegister(rt);
+        checkValidLabel(label);
+
+        int address = labelMap[label];
         
-        // calculate the offset
+        // calculating the offset
         int offset = address - lineNumber - 1;
         if(offset < 0) offset = 256 + offset;
 
-        binaryInstruction = opcode + registerMap[rs] + registerMap[rt] + toBinary(offset, 8);
-        cerr << instruction << " " << opcode << " " << registerMap[rs] << " " << registerMap[rt] << " " << toBinary(offset, 8) << endl;
-        return binaryInstruction;
+        binary = opcode + registerMap[rs] + registerMap[rt] + toBinary(offset, 8);
+        cerr << tokens[0] << " " << opcode << " " << registerMap[rs] << " " << registerMap[rt] << " " << toBinary(offset, 8) << endl;
     }
-    else {
-        // LABEL
-        // LABEL: Opcode + Address
-        string label = instruction;
-        label.pop_back();
-        labelMap[label] = lineNumber;
-        cerr << "LABEL " << label << " " << lineNumber << endl;
-
-        return "";
+    else { 
+        // DO NOTHING
     }
 
-    return binaryInstruction;
+    return binary;
 }
-
 
 int main()
 {
-    string path       = "D:\\CSE_CourseMaterials\\CSES 210 - ARCHITECTURE SESSIONAL\\MIPS_Assignment_03\\ASSEMBLY\\";
+    string path = "D:\\CSE_CourseMaterials\\CSES 210 - ARCHITECTURE SESSIONAL\\MIPS_Assignment_03\\ASSEMBLY\\";
     string binaryPath = "D:\\CSE_CourseMaterials\\CSES 210 - ARCHITECTURE SESSIONAL\\MIPS_Assignment_03\\BINARY\\";
-    
-    string filename = "tushar_sir.mips";
-    string inputFileName = path + filename;
 
+    string filename = "tushar_sir.mips";
+
+    string inputFileName = path + filename;
     string outputFilename = binaryPath + "BIN_" + filename.substr(0, filename.find(".")) + ".txt";
 
     ifstream inputFile(inputFileName);
@@ -247,42 +318,34 @@ int main()
 
     outputFile << "v2.0 raw" << endl;
 
-    // label update
-    string line;
-    int lineNumber = 1;
-    while (getline(inputFile, line))
+    vector<string> lines = readFile(inputFileName);
+
+    // Set $sp to the highest memory address
+    lines.insert(lines.begin(), "addi $sp, $zero, -1");
+
+    updateLabelMaps(lines);
+
+    int lineNumber = 0;
+    for (string line : lines)
     {
-        if (line.empty() || line == "\n") continue;
-        int val = updateLabels(line, lineNumber);
-        if (val == 0) continue;
-        lineNumber++;
+        vector<string> tokens = tokenizer(line);
+        if(tokens.size() > 0)
+        {
+            string binary = getBinary(tokens, lineNumber);
+            if(!binary.empty() && binary != "\n" && binary != "")
+            {
+                outputFile << binaryToHex(binary) << endl;
+                lineNumber++;
+            }
+        }
     }
-    cout<<"ALL THE JUMPS EVALUATED\n"<<endl;
 
     inputFile.close();
-    ifstream inputFile2(inputFileName);
-
-    lineNumber = 0;
-    // Setting the stack pointer register to the highest memory address
-    // addi 1010 0110 0110 11111111
-    string setSP = opcodeMap["addi"] + registerMap["$zero"] + registerMap["$sp"] + toBinary(-1, 8);
-    outputFile << binaryToHex(setSP) << endl;
-    lineNumber++;
-    
-    while (getline(inputFile2, line))
-    {
-        if (line.empty() || line == "\n") continue;
-        string binary = convertToBinary(line, lineNumber);
-        if (binary.empty()) continue;
-        string hexValue = binaryToHex(binary);
-        outputFile << hexValue << endl;
-        lineNumber++;
-    }
-
-    inputFile2.close();
     outputFile.close();
 
-    cout << "Conversion complete. Check '" << outputFilename << "' for results in hexadecimal format." << endl;
+    cerr << endl;
+    cerr << "Binary conversion completed." << endl;
+    cerr << "Output file: " << outputFilename << endl;
 
     return 0;
 }
