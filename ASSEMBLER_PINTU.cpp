@@ -4,14 +4,14 @@
 #include <unordered_map>
 #include <vector>
 #include <bitset>
+#include <iomanip> 
 #include <algorithm>
-#include <iomanip> // For formatting hexadecimal output
 
 using namespace std;
 
 // Map for opcodes
 unordered_map<string, string> opcodeMap = {
-    {"sub", "0000"}, {"srl", "0001"}, {"andi", "0010"}, {"ori", "0011"}, {"nor", "0100"}, {"bneq", "0101"}, {"and", "0110"}, {"beq", "0111"}, {"sw", "1000"}, {"subi", "1001"}, {"addi", "1010"}, {"sll", "1011"}, {"add", "1100"}, {"lw", "1101"}, {"or", "1110"}, {"j", "1111"}};
+    {"lw", "0000"}, {"nor", "0001"}, {"addi", "0010"}, {"bneq", "0011"}, {"beq", "0100"}, {"ori", "0101"}, {"andi", "0110"}, {"add", "0111"}, {"and", "1000"}, {"subi", "1001"}, {"sub", "1010"}, {"srl", "1011"}, {"sll", "1100"}, {"sw", "1101"}, {"or", "1110"}, {"j", "1111"}};
 
 // Map for registers
 unordered_map<string, string> registerMap = {
@@ -20,6 +20,20 @@ unordered_map<string, string> registerMap = {
 // Map for labels
 unordered_map<string, int> labelMap;
 
+// Function to convert immediate/address values to binary
+string toBinary(int value, int bits)
+{
+    return bitset<16>(value).to_string().substr(16 - bits, bits);
+}
+
+// Function to convert binary string to hexadecimal string
+string binaryToHex(const string &binary)
+{
+    stringstream ss;
+    unsigned long decimalValue = bitset<32>(binary).to_ulong(); // Convert binary to decimal
+    ss << hex << setw(binary.length() / 4) << setfill('0') << decimalValue; // Convert decimal to hex
+    return ss.str();
+}
 
 // Function to remove all commas from a string
 string removeCommas(const string &str)
@@ -39,8 +53,21 @@ int updateLabels(const string &line, int lineNumber)
 
     int val = 1;
 
-    if (instruction[0] == '#' || opcodeMap.find(instruction) == registerMap.end())
-    {
+    if (instruction[0] == '#'){
+    }
+    else if (instruction == "j"){
+    }
+    else if (instruction == "sub" || instruction == "and" || instruction == "or" || instruction == "nor" || instruction == "add"){
+    }
+    else if (instruction == "srl" || instruction == "sll"){
+    }
+    else if (instruction == "lw" || instruction == "sw"){
+    }
+    else if (instruction == "addi" || instruction == "subi" || instruction == "andi" || instruction == "ori"){
+    }
+    else if (instruction == "beq" || instruction == "bneq"){
+    }
+    else {
         // LABEL
         string label = instruction;
         label.pop_back();
@@ -52,47 +79,6 @@ int updateLabels(const string &line, int lineNumber)
     return val;
 }
 
-// Function to convert immediate/address values to binary
-string toBinary(int value, int bits)
-{
-    return bitset<16>(value).to_string().substr(16 - bits, bits);
-}
-
-string binaryToTwosComplement(string binary)
-{
-    bool foundOne = false;
-    for (int i = binary.length() - 1; i >= 0; i--)
-    {
-        if (binary[i] == '1' && !foundOne)
-        {
-            foundOne = true;
-            continue;
-        }
-        binary[i] = (binary[i] == '0') ? '1' : '0';
-    }
-    return binary;
-}
-
-// Function to convert binary string to hexadecimal string
-string binaryToHex(const string &binary)
-{
-    stringstream ss;
-    unsigned long decimalValue = bitset<32>(binary).to_ulong(); // Convert binary to decimal
-    ss << hex /* << uppercase */ << setw(binary.length() / 4) << setfill('0') << decimalValue; // Convert decimal to hex
-    return ss.str();
-}
-
-void checkValidRegister(const string &reg)
-{
-    if (registerMap.find(reg) == registerMap.end())
-    {
-        cerr << "Invalid register: " << reg << endl;
-        cerr << "Exiting program..." << endl;
-        exit(1);
-    }
-}
-
-// Function to parse and convert assembly instruction to binary
 string convertToBinary(const string &line, int lineNumber)
 {
     string cleanLine = removeCommas(line);
@@ -103,16 +89,15 @@ string convertToBinary(const string &line, int lineNumber)
     // Identify instruction type based on opcode
     string opcode = opcodeMap[instruction];
     string binaryInstruction;
-    
-    // a comment start with #
+
+    // Comment handling
     if (instruction[0] == '#') 
     {
-        cerr << "COMMENT " << line << endl;
+        cerr << "COMMENT " << cleanLine << endl;
     }
     else if (instruction == "j")
     {
         // J-type: Opcode + Address
-        // two possiblity either a number was given or a label
         ss >> jumpAddress;
         int address;
         if (isdigit(jumpAddress[0])) 
@@ -132,88 +117,66 @@ string convertToBinary(const string &line, int lineNumber)
              instruction == "nor" || instruction == "add") 
     {
         // NORMAL R TYPE
-        // R-type: Opcode + rs + rt + rd + shift
         ss >> rd >> rs >> rt;
-
-        checkValidRegister(rs);
-        checkValidRegister(rt);
-        checkValidRegister(rd);
-
         binaryInstruction = opcode + registerMap[rs] + registerMap[rt] + registerMap[rd] + "0000";
 
-        cerr << instruction << " " << opcode << " " << registerMap[rs] << " " << registerMap[rt] << " " << registerMap[rd] << " " << "0000" << endl;
+        cerr << "ALU " << opcode << " " << registerMap[rs] << " " << registerMap[rt] << " " << registerMap[rd] << " " << "0000" << endl;
     }
     else if (instruction == "srl" || instruction == "sll")
     {
         // SHIFT R TYPE
-        // R-type: Opcode + rs + rt + rd + shift
         ss >> rd >> rt >> shiftAmt;
-
-        checkValidRegister(rt);
-        checkValidRegister(rd);
-
         int shiftAmount = stoi(shiftAmt);
-        // WHEN SHIFTING USE RS AS NUMBER , RT AS DESTINATION REGISTER , SHIFT AMOUNT AS SHIFT AMOUNT
         binaryInstruction = opcode + registerMap[rt] + registerMap[rd] + toBinary(shiftAmount, 8);
 
-        cerr << instruction << " " << opcode << " " << registerMap[rt] << " " << registerMap[rd] << " " << toBinary(shiftAmount, 8) << endl;
+        cerr << "SHI " << opcode << " " << registerMap[rt] << " " << registerMap[rd] << " " << toBinary(shiftAmount, 8) << endl;
     }
-    else if(instruction == "addi" || instruction == "subi" || 
-            instruction == "andi" || instruction == "ori")
-    {
-        // I-type: Opcode + rs + rt + Immediate
-        ss >> rt >> rs >> imm;
-        int immediate = stoi(imm);
-
-        checkValidRegister(rs);
-        checkValidRegister(rt);
-
-        binaryInstruction = opcode + registerMap[rs] + registerMap[rt] + toBinary(immediate, 8);
-    
-        cerr << instruction << " " << opcode << " " << registerMap[rs] << " " << registerMap[rt] << " " << toBinary(immediate, 8) << endl;
-    }
-    else if(instruction == "lw" || instruction == "sw")
+    else if (instruction == "lw" || instruction == "sw")
     {
         // Updated I-type format for lw/sw: Opcode + rs + rt + Immediate
         ss >> rt; // Get the destination register (e.g., $t0)
-        checkValidRegister(rt);
 
         string offsetAndSrc; // Format: offset($src_register)
         ss >> offsetAndSrc;
 
         // Extract offset and source register
         size_t parenPos = offsetAndSrc.find('(');
-        int immediate = stoi(offsetAndSrc.substr(0, parenPos)); // Extract offset before '('
-        string rs = offsetAndSrc.substr(parenPos + 1, offsetAndSrc.length() - parenPos - 2); // Extract register inside '()'
+        int offset = stoi(offsetAndSrc.substr(0, parenPos)); // Extract offset before '('
+        string src = offsetAndSrc.substr(parenPos + 1, offsetAndSrc.length() - parenPos - 2); // Extract register inside '()'
 
-        checkValidRegister(rs);
+        binaryInstruction = opcode + registerMap[src] + registerMap[rt] + toBinary(offset, 8);
 
-        binaryInstruction = opcode + registerMap[rs] + registerMap[rt] + toBinary(immediate, 8);
-
-        cerr << instruction << " " << opcode << " " << registerMap[rs] << " " << registerMap[rt] << " " << toBinary(immediate, 8) << endl;
+        cerr << "MEM " << opcode << " " << registerMap[src] << " " << registerMap[rt] << " " << toBinary(offset, 8) << endl;
     }
-    else if(instruction == "beq" || instruction == "bneq")
+    else if (instruction == "addi" || instruction == "subi" || instruction == "andi" || instruction == "ori")
     {
-        // BRANCH I TYPE
         // I-type: Opcode + rs + rt + Immediate
         ss >> rt >> rs >> imm;
-        // imm is a label or a address if number
-        int address = labelMap[imm];
+        int immediate = stoi(imm);
 
-        checkValidRegister(rs);
-        checkValidRegister(rt);
-        
-        // calculate the offset
+        if (immediate < 0) 
+        {
+            immediate = immediate + 512;
+        }
+
+        binaryInstruction = opcode + registerMap[rs] + registerMap[rt] + toBinary(immediate, 8);
+    
+        cerr << "IMM " << opcode << " " << registerMap[rs] << " " << registerMap[rt] << " " << toBinary(immediate, 8) << endl;
+    }
+    else if (instruction == "beq" || instruction == "bneq")
+    {
+        // BRANCH I TYPE
+        ss >> rt >> rs >> imm;
+        int address = labelMap[imm];
         int offset = address - lineNumber - 1;
-        if(offset < 0) offset = 256 + offset;
+        if (offset < 0) offset = 256 + offset;
 
         binaryInstruction = opcode + registerMap[rs] + registerMap[rt] + toBinary(offset, 8);
-        cerr << instruction << " " << opcode << " " << registerMap[rs] << " " << registerMap[rt] << " " << toBinary(offset, 8) << endl;
-        return binaryInstruction;
+        cerr << "BRANCH " << opcode << " " << registerMap[rs] << " " << registerMap[rt] << " " << toBinary(offset, 8) << endl;
     }
-    else {
+    else 
+    {
         // LABEL
-        // LABEL: Opcode + Address
         string label = instruction;
         label.pop_back();
         labelMap[label] = lineNumber;
@@ -249,7 +212,7 @@ int main()
 
     // label update
     string line;
-    int lineNumber = 1;
+    int lineNumber = 0;
     while (getline(inputFile, line))
     {
         if (line.empty() || line == "\n") continue;
@@ -263,12 +226,6 @@ int main()
     ifstream inputFile2(inputFileName);
 
     lineNumber = 0;
-    // Setting the stack pointer register to the highest memory address
-    // addi 1010 0110 0110 11111111
-    string setSP = opcodeMap["addi"] + registerMap["$zero"] + registerMap["$sp"] + toBinary(-1, 8);
-    outputFile << binaryToHex(setSP) << endl;
-    lineNumber++;
-    
     while (getline(inputFile2, line))
     {
         if (line.empty() || line == "\n") continue;
