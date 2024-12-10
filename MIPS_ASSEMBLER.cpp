@@ -1,6 +1,8 @@
 #include <bits/stdc++.h>
 using namespace std;
 
+bool is_pipelined = false;
+
 // Map for opcodes
 unordered_map<string, string> opcodeMap = {
     {"sub", "0000"},  {"srl", "0001"},  {"andi", "0010"}, 
@@ -10,11 +12,26 @@ unordered_map<string, string> opcodeMap = {
     {"add", "1100"},  {"lw", "1101"},   {"or", "1110"}, 
     {"j", "1111"},    {"nop", "0000"}};
 
+// unordered_map<string, string> registerMap = {
+//     {"$zero", "0000"}, {"$t1", "0001"}, {"$t2", "0010"}, 
+//     {"$t3", "0011"}, {"$t4", "0100"}, {"$t0", "0101"}, 
+//     {"$sp", "0110"}};
+
 // Map for registers
 unordered_map<string, string> registerMap = {
-    {"$zero", "0000"}, {"$t1", "0001"}, {"$t2", "0010"}, 
-    {"$t3", "0011"}, {"$t4", "0100"}, {"$t0", "0101"}, 
-    {"$sp", "0110"}};
+    {"$zero", "0000"},
+
+    {"$t0", "0001"}, {"$t1", "0010"}, {"$t2", "0011"}, 
+    {"$t3", "0100"}, {"$t4", "0101"}, {"$t5", "0110"}, 
+
+    {"$v0", "0111"}, {"$v1", "1000"},
+
+    {"$a0", "1001"}, {"$a1", "1010"},
+    
+    {"$s0", "1011"}, {"$s1", "1100"}, {"$s2", "1101"},
+    {"$s3", "1110"}, {"$s4", "1111"}
+};
+
 
 // Map for labels
 unordered_map<string, int> labelMap;
@@ -370,7 +387,7 @@ int main()
     // Set $sp to the highest memory address
     lines.insert(lines.begin(), "addi $sp, $zero, -1");
 
-    lines = updateLines(lines);
+    if(is_pipelined) lines = updateLines(lines);
     updateLabelMaps(lines);
 
     // for(string line : lines)
