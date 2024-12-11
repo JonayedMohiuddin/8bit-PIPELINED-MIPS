@@ -2,6 +2,7 @@
 # 1($io) => Y ENABLE + DATA
 # 2($io) => UPDATE FLAG
 # 3($io) => FLUSH FLAG
+# 4($io) => KEYBOARD INPUT
 # 15($io) => RAND INPUT
 
 addi $t2, $zero 32
@@ -9,7 +10,7 @@ addi $t0, $zero, 0 # initial x at 0
 draw:
 
 repeat:
-lw $t1, 15($io) # load random input for y value
+lw $t1, 4($io) # load keyboard input for y value
 sw $t0, 0($io) # store x value
 sw $t1, 1($io) # store y value
 sw $zero, 2($io) # update flag
