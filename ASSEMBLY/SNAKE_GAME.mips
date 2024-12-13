@@ -1,7 +1,13 @@
-# SNAKE GAME PROGRAM
+# CLASSICAL SNAKE GAME
 # MADE BY : JONAYED MOHIUDDIN 
 # EMAIL   : jonayedmohiuddin@gmail.com
 # Intended to run by the 8-bit mips here : https://github.com/JonayedMohiuddin/8bit_MIPS
+
+# WIN  : Score more than 25
+# LOSE : Bite yourself
+# CONTROLS : w/W = UP, d/D = RIGHT, s/S = DOWN, a/A = LEFT
+# DISPLAY : 16 x 32 LED matrix and 2 x 7 digit display 
+# !! DISPLAY Caution: x is 5 bit and y is 4 bit
 
 # IO PORTS:
 # 0($io) => X ENABLE + DATA
@@ -13,28 +19,29 @@
 # 14($io) => DEBUG OUTPUT 
 # 15($io) => RAND INPUT
 
-# x is 5 bit and y is 4 bit
+# REGISTERS:
+# $zero, $sp, $io, $t0, $t1, $t2, $t3, $t4, $v0, $v1, $v2, $v3, $s0, $s1, $s2, $s3
+# Renamed : $t3 -> head, $t4 -> tail, $s0 -> $dir, $s1 -> $score, $s2 -> $foodX, $s3 -> $foodY
 
-# s0 = direction of snake head
-# 7 = UP, 4 = RIGHT, 3 = DOWN, 1 = LEFT
+# t3 = head 
+# t4 = tail
+# $s0 = direction of snake head
 # s1 = score
 # s2 = x of food
 # s3 = y of food
 
-# t3 = head 
-# t4 = tail
-
-# MEMORY MAP:
-# 160 - 175 : IO PORTS
-# 192 - 255 : to make wrapping just or with 11000000 = -64 or 192
-
-# Snake body is a circular queue 
-
-# keyboard input keep lsb 3 bits of ascii value
+# Control Mapping:
 # 011 = w/W = UP = 3
 # 100 = d/D = RIGHT = 4
 # 111 = s/S = DOWN = 7
 # 001 = a/A = LEFT = 1
+
+# MEMORY MAPPING:
+# 000 - 159 : DATA + STACK
+# 160 - 175 : IO PORTS
+# 192 - 255 : to make wrapping just or with 11000000 = -64 or 192
+
+# Snake body is a circular queue [start = tail, end = head] 
 
 main:
     # initialise values

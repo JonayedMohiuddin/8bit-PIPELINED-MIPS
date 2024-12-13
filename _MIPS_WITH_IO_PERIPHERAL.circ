@@ -3964,6 +3964,7 @@ c40 501 500 505 900 780 902 8
     </comp>
     <comp lib="0" loc="(90,120)" name="Probe">
       <a name="facing" val="south"/>
+      <a name="radix" val="10unsigned"/>
     </comp>
     <comp lib="0" loc="(1060,580)" name="Probe">
       <a name="facing" val="south"/>
