@@ -381,7 +381,7 @@ int main()
     string path = "D:\\CSE_CourseMaterials\\CSES 210 - ARCHITECTURE SESSIONAL\\MIPS_Assignment_03\\ASSEMBLY\\";
     string binaryPath = "D:\\CSE_CourseMaterials\\CSES 210 - ARCHITECTURE SESSIONAL\\MIPS_Assignment_03\\BINARY\\";
 
-    string filename = "TEST.mips";
+    string filename = "SNAKE_GAME.mips";
 
     string inputFileName = path + filename;
     string outputFilename = binaryPath + "BIN_" + filename.substr(0, filename.find(".")) + ".txt";

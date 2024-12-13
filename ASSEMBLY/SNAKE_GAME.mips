@@ -1,10 +1,16 @@
+# SNAKE GAME PROGRAM
+# MADE BY : JONAYED MOHIUDDIN 
+# EMAIL   : jonayedmohiuddin@gmail.com
+# Intended to run by the 8-bit mips here : https://github.com/JonayedMohiuddin/8bit_MIPS
+
+# IO PORTS:
 # 0($io) => X ENABLE + DATA
 # 1($io) => Y ENABLE + DATA
 # 2($io) => UPDATE FLAG
 # 3($io) => FLUSH FLAG
 # 4($io) => KEYBOARD INPUT
-# 13($io) => Score Board
-# 14($io) => Debug Output 
+# 13($io) => SCORE BOARD
+# 14($io) => DEBUG OUTPUT 
 # 15($io) => RAND INPUT
 
 # x is 5 bit and y is 4 bit
@@ -22,7 +28,9 @@
 # 160 - 175 : IO PORTS
 # 192 - 255 : to make wrapping just or with 11000000 = -64 or 192
 
-# keyboard input keep lsb 3 bits
+# Snake body is a circular queue 
+
+# keyboard input keep lsb 3 bits of ascii value
 # 011 = w/W = UP = 3
 # 100 = d/D = RIGHT = 4
 # 111 = s/S = DOWN = 7
@@ -81,6 +89,8 @@ game_loop:
     ori $head, $head, 192 # !! wrap around
     sw $t0, 0($head)
     sw $t1, 1($head)
+    andi $t0, $t0, 31
+    andi $t1, $t1, 15
 
     # check if snake head is on snake body
     addi $t2, $tail, 0 # loop index
@@ -88,7 +98,7 @@ game_loop:
     after_check_collision:
 
     # check if snake head is on food
-    beq $t0, $foodX, check_y # x position matches, now check y
+    beq $t0, $foodX, check_food_collision_y # x position matches, now check y
     
     food_not_eaten:
     
@@ -107,14 +117,14 @@ check_collision:
     after_check_collision_x:
     addi $t2, $t2, 2 # next body
     ori $t2, $t2, 192 # !! wrap around
-    bneq $t2, $head, check_collision # loop until tail
+    bneq $t2, $head, check_collision # loop until head
     j after_check_collision
 
 check_collision_y:
-    beq $t1, $v1, exit # y position matches, game over
+    beq $t1, $v1, exit # y position also matches, head body collision
     j after_check_collision_x
 
-check_y:
+check_food_collision_y:
     bneq $t1, $foodY, food_not_eaten # y position does not match, food not eaten
     addi $score, $score, 1 # else y position matches, food eaten
     sw $score, 13($io) # update score
@@ -123,7 +133,15 @@ check_y:
     lw $foodY, 15($io)
     andi $foodX, $foodX, 31
     andi $foodY, $foodY, 15
-    j food_eaten
+    
+    # if score > 25 then game over with win
+    subi $t2, $score, 26 # subtract from max score to check if greater than max score
+    sw $t2, 14($io)
+    # and with 10000000 to check if negative
+    andi $t2, $t2, 128
+    sw $t2, 14($io)
+    bneq $t2, $zero, food_eaten
+    j exit
 
 up:
     beq  $dir, $v2, down
