@@ -4251,7 +4251,7 @@ c40 501 500 505 900 780 902 8
       <a name="matrixcols" val="32"/>
       <a name="matrixrows" val="16"/>
     </comp>
-    <comp loc="(620,230)" name="Display Adapter"/>
+    <comp loc="(620,230)" name="16 x 32 Display Adapter"/>
     <comp lib="0" loc="(250,700)" name="Tunnel">
       <a name="facing" val="south"/>
       <a name="label" val="I"/>
@@ -6649,8 +6649,8 @@ c40 501 500 505 900 780 902 8
     </comp>
     <comp lib="1" loc="(410,240)" name="NOT Gate"/>
   </circuit>
-  <circuit name="Display Adapter">
-    <a name="circuit" val="Display Adapter"/>
+  <circuit name="16 x 32 Display Adapter">
+    <a name="circuit" val="16 x 32 Display Adapter"/>
     <a name="clabel" val=""/>
     <a name="clabelup" val="east"/>
     <a name="clabelfont" val="SansSerif plain 12"/>
