@@ -69,28 +69,30 @@ game_loop:
     # key bind registers
     addi $v0, $zero, 3 # UP
     addi $v1, $zero, 4 # RIGHT
-    # not used else where so no need to init every time
+    # Not used else where so no need to init every time
     # addi $v2, $zero, 7 # DOWN
     # addi $v3, $zero, 1 # LEFT
 
-    # update head position
-    beq $t2, $v0, up
+    # update head position according to key pressed 
+    beq $t2, $v0, up    
     beq $t2, $v1, right
     beq $t2, $v2, down
     beq $t2, $v3, left
+    # no key pressed, continue with current direction
     beq $dir, $v0, up
     beq $dir, $v1, right
     beq $dir, $v2, down
     beq $dir, $v3, left
+    
     after_head_update:
 
     # save head position
     addi $head, $head, 2 # move head to next position
     ori $head, $head, 192 # !! wrap around
-    sw $t0, 0($head)
-    sw $t1, 1($head)
     andi $t0, $t0, 31
     andi $t1, $t1, 15
+    sw $t0, 0($head)
+    sw $t1, 1($head)
 
     # check if snake head is on snake body
     addi $t2, $tail, 0 # loop index
@@ -113,6 +115,9 @@ game_loop:
 check_collision:
     lw $v0, 0($t2) # x of body part
     lw $v1, 1($t2) # y of body part
+    # no need to mod again here as they are saved as 5 bit and 4 bit
+    # andi $v0, $v0, 31
+    # andi $v1, $v1, 15
     beq $t0, $v0, check_collision_y # x position matches, now check y
     after_check_collision_x:
     addi $t2, $t2, 2 # next body
@@ -128,11 +133,11 @@ check_food_collision_y:
     bneq $t1, $foodY, food_not_eaten # y position does not match, food not eaten
     addi $score, $score, 1 # else y position matches, food eaten
     sw $score, 13($io) # update score
-    # get new random food position
+    # get new random food position from RNG
     lw $foodX, 15($io)
-    lw $foodY, 15($io)
-    andi $foodX, $foodX, 31
-    andi $foodY, $foodY, 15
+    lw $foodY, 15($io) 
+    andi $foodX, $foodX, 31 # display x is 5 bit
+    andi $foodY, $foodY, 15 # display y is 4 bit
     
     # if score > 25 then game over with win
     subi $t2, $score, 26 # subtract from max score to check if greater than max score
@@ -144,60 +149,60 @@ check_food_collision_y:
     j exit
 
 up:
-    beq  $dir, $v2, down
-    addi $t1, $t1, -1
-    add  $dir, $zero, $v0
-    j after_head_update
+    beq  $dir, $v2, down   # if current direction is down, then ignore up
+    addi $t1, $t1, -1      # y = y - 1
+    add  $dir, $zero, $v0  # set direction to up
+    j after_head_update    
 
 right:
-    beq  $dir, $v3, left
-    addi $t0, $t0, 1
-    add  $dir, $zero, $v1
+    beq  $dir, $v3, left  # if current direction is left, then ignore right
+    addi $t0, $t0, 1      # x = x + 1
+    add  $dir, $zero, $v1 # set direction to right
     j after_head_update
 
 down:
-    beq  $dir, $v0, up
-    addi $t1, $t1, 1
-    add  $dir, $zero, $v2
+    beq  $dir, $v0, up      # if current direction is up, then ignore down
+    addi $t1, $t1, 1        # y = y + 1
+    add  $dir, $zero, $v2   # set direction to down
     j after_head_update
 
 left:
-    beq  $dir, $v1, right
-    addi $t0, $t0, -1
-    add  $dir, $zero, $v3
+    beq  $dir, $v1, right   # if current direction is right, then ignore left
+    addi $t0, $t0, -1       # x = x - 1
+    add  $dir, $zero, $v3   # set direction to left
     j after_head_update
 
 init:
-    # get random food position
+    # Get random food position from RNG
     lw $foodX, 15($io)
     lw $foodY, 15($io)
-    andi $foodX, $foodX, 31
-    andi $foodY, $foodY, 15
+    andi $foodX, $foodX, 31 # display x is 5 bit
+    andi $foodY, $foodY, 15 # display y is 4 bit
 
-    addi $dir, $zero, 4 # initial direction right
+    addi $dir, $zero, 4 # initial direction = right
     
-    addi $score, $zero, 0 # initial score 0
-    sw $score, 13($io)
+    addi $score, $zero, 0 # initial score = 0
+    sw $score, 13($io)    # send score to 7 digit display
 
-    addi $tail, $zero, 192
-    addi $head, $tail, 6 # initial snake size 8
-    # each body part is 2 bytes
+    addi $tail, $zero, 192 # tail start from meomory location 192
+    addi $head, $tail, 6   # initial snake size is 3 (but x and y are 2 bytes)
+    # each body part is 2 bytes (x, y kept in 2 consecutive memory location)
 
     # initial snake body
-    addi $t0, $zero, 7 # x
-    addi $t1, $zero, 7 # y
+    addi $t0, $zero, 7 # x0 = 7
+    addi $t1, $zero, 7 # y0 = 7
     sw $t0, 0($tail)
     sw $t1, 1($tail)
-    addi $t0, $zero, 8
-    addi $t1, $zero, 7
+    addi $t0, $zero, 8 # x1 = 8
+    addi $t1, $zero, 7 # y1 = 7
     sw $t0, 2($tail)
     sw $t1, 3($tail)
-    addi $t0, $zero, 9
-    addi $t1, $zero, 7
+    addi $t0, $zero, 9 # x2 = 9
+    addi $t1, $zero, 7 # y2 = 7
     sw $t0, 4($tail)
     sw $t1, 5($tail)
-    addi $t0, $zero, 10
-    addi $t1, $zero, 7
+    addi $t0, $zero, 10 # x3 = 10 = head_x
+    addi $t1, $zero, 7  # y3 = 7 = head_y
     sw $t0, 6($tail)
     sw $t1, 7($tail)
 
@@ -215,10 +220,10 @@ draw_snake_loop:
     sw $t1, 0($io) # send x to display
     sw $t2, 1($io) # send y to display
     sw $zero, 2($io) # update display
-    beq $t0, $head, after_draw_snake
+    beq $t0, $head, after_draw_snake # drew head, stop here
     addi $t0, $t0, 2 # next body
     ori $t0, $t0, 192 # !! wrap around
 
-    j draw_snake_loop
+    j draw_snake_loop 
 
 exit:

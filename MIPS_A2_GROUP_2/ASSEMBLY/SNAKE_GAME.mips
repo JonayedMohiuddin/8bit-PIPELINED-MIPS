@@ -1,0 +1,224 @@
+# SNAKE GAME PROGRAM
+# MADE BY : JONAYED MOHIUDDIN 
+# EMAIL   : jonayedmohiuddin@gmail.com
+# Intended to run by the 8-bit mips here : https://github.com/JonayedMohiuddin/8bit_MIPS
+
+# IO PORTS:
+# 0($io) => X ENABLE + DATA
+# 1($io) => Y ENABLE + DATA
+# 2($io) => UPDATE FLAG
+# 3($io) => FLUSH FLAG
+# 4($io) => KEYBOARD INPUT
+# 13($io) => SCORE BOARD
+# 14($io) => DEBUG OUTPUT 
+# 15($io) => RAND INPUT
+
+# x is 5 bit and y is 4 bit
+
+# s0 = direction of snake head
+# 7 = UP, 4 = RIGHT, 3 = DOWN, 1 = LEFT
+# s1 = score
+# s2 = x of food
+# s3 = y of food
+
+# t3 = head 
+# t4 = tail
+
+# MEMORY MAP:
+# 160 - 175 : IO PORTS
+# 192 - 255 : to make wrapping just or with 11000000 = -64 or 192
+
+# Snake body is a circular queue 
+
+# keyboard input keep lsb 3 bits of ascii value
+# 011 = w/W = UP = 3
+# 100 = d/D = RIGHT = 4
+# 111 = s/S = DOWN = 7
+# 001 = a/A = LEFT = 1
+
+main:
+    # initialise values
+    j init
+    after_init:
+    j game_loop
+
+game_loop:
+    # send food position to display
+    sw $foodX, 0($io)
+    sw $foodY, 1($io)
+    sw $zero, 2($io)
+
+    # draw snake
+    addi $t0, $tail, 0 # loop index
+    j draw_snake_loop
+    after_draw_snake:
+
+    # flush display
+    sw $zero, 3($io)
+
+    # get keyboard input
+    addi $t2, $zero, 0
+    lw $t2, 4($io)
+    andi $t2, $t2, 7 # keep lsb 3 bits, 111 UP, 100 RIGHT, 011 DOWN, 001 LEFT
+
+    # update snake direction
+    # update snakes head
+    lw $t0, 0($head) # x of head
+    lw $t1, 1($head) # y of head
+
+    # key bind registers
+    addi $v0, $zero, 3 # UP
+    addi $v1, $zero, 4 # RIGHT
+    # not used else where so no need to init every time
+    # addi $v2, $zero, 7 # DOWN
+    # addi $v3, $zero, 1 # LEFT
+
+    # update head position
+    beq $t2, $v0, up
+    beq $t2, $v1, right
+    beq $t2, $v2, down
+    beq $t2, $v3, left
+    beq $dir, $v0, up
+    beq $dir, $v1, right
+    beq $dir, $v2, down
+    beq $dir, $v3, left
+    after_head_update:
+
+    # save head position
+    addi $head, $head, 2 # move head to next position
+    ori $head, $head, 192 # !! wrap around
+    sw $t0, 0($head)
+    sw $t1, 1($head)
+    andi $t0, $t0, 31
+    andi $t1, $t1, 15
+
+    # check if snake head is on snake body
+    addi $t2, $tail, 0 # loop index
+    j check_collision
+    after_check_collision:
+
+    # check if snake head is on food
+    beq $t0, $foodX, check_food_collision_y # x position matches, now check y
+    
+    food_not_eaten:
+    
+    # update tail position if food not eaten
+    addi $tail, $tail, 2 # move tail to next position
+    ori $tail, $tail, 192 # !! wrap around
+
+    food_eaten:
+
+    j game_loop
+
+check_collision:
+    lw $v0, 0($t2) # x of body part
+    lw $v1, 1($t2) # y of body part
+    beq $t0, $v0, check_collision_y # x position matches, now check y
+    after_check_collision_x:
+    addi $t2, $t2, 2 # next body
+    ori $t2, $t2, 192 # !! wrap around
+    bneq $t2, $head, check_collision # loop until head
+    j after_check_collision
+
+check_collision_y:
+    beq $t1, $v1, exit # y position also matches, head body collision
+    j after_check_collision_x
+
+check_food_collision_y:
+    bneq $t1, $foodY, food_not_eaten # y position does not match, food not eaten
+    addi $score, $score, 1 # else y position matches, food eaten
+    sw $score, 13($io) # update score
+    # get new random food position
+    lw $foodX, 15($io)
+    lw $foodY, 15($io)
+    andi $foodX, $foodX, 31
+    andi $foodY, $foodY, 15
+    
+    # if score > 25 then game over with win
+    subi $t2, $score, 26 # subtract from max score to check if greater than max score
+    sw $t2, 14($io)
+    # and with 10000000 to check if negative
+    andi $t2, $t2, 128
+    sw $t2, 14($io)
+    bneq $t2, $zero, food_eaten
+    j exit
+
+up:
+    beq  $dir, $v2, down
+    addi $t1, $t1, -1
+    add  $dir, $zero, $v0
+    j after_head_update
+
+right:
+    beq  $dir, $v3, left
+    addi $t0, $t0, 1
+    add  $dir, $zero, $v1
+    j after_head_update
+
+down:
+    beq  $dir, $v0, up
+    addi $t1, $t1, 1
+    add  $dir, $zero, $v2
+    j after_head_update
+
+left:
+    beq  $dir, $v1, right
+    addi $t0, $t0, -1
+    add  $dir, $zero, $v3
+    j after_head_update
+
+init:
+    # get random food position
+    lw $foodX, 15($io)
+    lw $foodY, 15($io)
+    andi $foodX, $foodX, 31
+    andi $foodY, $foodY, 15
+
+    addi $dir, $zero, 4 # initial direction right
+    
+    addi $score, $zero, 0 # initial score 0
+    sw $score, 13($io)
+
+    addi $tail, $zero, 192
+    addi $head, $tail, 6 # initial snake size 8
+    # each body part is 2 bytes
+
+    # initial snake body
+    addi $t0, $zero, 7 # x
+    addi $t1, $zero, 7 # y
+    sw $t0, 0($tail)
+    sw $t1, 1($tail)
+    addi $t0, $zero, 8
+    addi $t1, $zero, 7
+    sw $t0, 2($tail)
+    sw $t1, 3($tail)
+    addi $t0, $zero, 9
+    addi $t1, $zero, 7
+    sw $t0, 4($tail)
+    sw $t1, 5($tail)
+    addi $t0, $zero, 10
+    addi $t1, $zero, 7
+    sw $t0, 6($tail)
+    sw $t1, 7($tail)
+
+    # set key bind register
+    addi $v0, $zero, 3 # UP
+    addi $v1, $zero, 4 # RIGHT
+    addi $v2, $zero, 7 # DOWN
+    addi $v3, $zero, 1 # LEFT
+
+    j after_init
+
+draw_snake_loop:
+    lw $t1, 0($t0) # x of snake body
+    lw $t2, 1($t0) # y of snake body
+    sw $t1, 0($io) # send x to display
+    sw $t2, 1($io) # send y to display
+    sw $zero, 2($io) # update display
+    beq $t0, $head, after_draw_snake
+    addi $t0, $t0, 2 # next body
+    ori $t0, $t0, 192 # !! wrap around
+
+    j draw_snake_loop
+
+exit:

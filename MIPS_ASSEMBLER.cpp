@@ -1,7 +1,7 @@
 #include <bits/stdc++.h>
 using namespace std;
 
-bool is_pipelined = false;
+bool is_pipelined = true;
 
 // Map for opcodes
 unordered_map<string, string> opcodeMap = {
@@ -12,26 +12,11 @@ unordered_map<string, string> opcodeMap = {
     {"add", "1100"},  {"lw", "1101"},   {"or", "1110"}, 
     {"j", "1111"},    {"nop", "0000"}};
 
-// unordered_map<string, string> registerMap = {
-//     {"$zero", "0000"}, {"$t1", "0001"}, {"$t2", "0010"}, 
-//     {"$t3", "0011"}, {"$t4", "0100"}, {"$t0", "0101"}, 
-//     {"$sp", "0110"}};
-
 // Map for registers
 unordered_map<string, string> registerMap = {
-    {"$zero", "0000"},
-
-    {"$t0", "0001"}, {"$t1", "0010"}, {"$t2", "0011"}, 
-    {"$t3", "0100"}, {"$t4", "0101"}, {"$t5", "0110"}, 
-
-    {"$v0", "0111"}, {"$v1", "1000"},
-
-    {"$a0", "1001"}, {"$a1", "1010"},
-    
-    {"$s0", "1011"}, {"$s1", "1100"}, {"$s2", "1101"},
-    {"$s3", "1110"}, {"$s4", "1111"}
-};
-
+    {"$zero", "0000"}, {"$t1", "0001"}, {"$t2", "0010"}, 
+    {"$t3", "0011"}, {"$t4", "0100"}, {"$t0", "0101"}, 
+    {"$sp", "0110"}};
 
 // Map for labels
 unordered_map<string, int> labelMap;
@@ -178,6 +163,7 @@ void updateLabelMaps(vector<string> lines)
     for (string line : lines)
     {
         vector<string> tokens = tokenizer(line);
+        if(tokens.size() == 0) continue;
         if (tokens[0].size() > 0 && tokens[0].back() == ':')
         {
             string label = tokens[0].substr(0, tokens[0].size() - 1);
@@ -369,7 +355,9 @@ int main()
     string filename = "tushar_sir.mips";
 
     string inputFileName = path + filename;
-    string outputFilename = binaryPath + "BIN_" + filename.substr(0, filename.find(".")) + ".txt";
+    string outputFilename = binaryPath + "BIN_" + filename.substr(0, filename.find("."));
+    if(is_pipelined) outputFilename += "_PIPELINED";
+    outputFilename += ".txt";
 
     ifstream inputFile(inputFileName);
     ofstream outputFile(outputFilename);
