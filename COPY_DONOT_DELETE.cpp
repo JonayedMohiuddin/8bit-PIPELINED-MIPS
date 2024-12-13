@@ -25,13 +25,18 @@ unordered_map<string, string> registerMap = {
     {"$zero", "0000"},
 
     {"$t0", "0001"}, {"$t1", "0010"}, {"$t2", "0011"}, 
-    // {"$t3", "0100"}, {"$t4", "0101"}, 
+    {"$t3", "0100"}, {"$t4", "0101"}, 
     
     {"$sp", "0110"}, 
+
+    {"$v0", "0111"}, 
     
-    {"$v0", "0111"}, {"$v1", "1000"}, {"$v2", "1001"}, {"$v3", "1010"},
+    {"$ra", "1000"},
+
+    {"$a0", "1001"}, {"$a1", "1010"},
     
-    // {"$s0", "1011"}, {"$s1", "1100"}, {"$s2", "1101"}, {"$s3", "1110"}, 
+    {"$s0", "1011"}, {"$s1", "1100"}, {"$s2", "1101"},
+    {"$s3", "1110"}, 
     
     {"$io", "1111"},
 
@@ -199,10 +204,6 @@ void updateLabelMaps(vector<string> lines)
             labelMap[label] = lineNumber;
 
             cerr << "Label: " << label << " at line: " << lineNumber << endl;
-        }
-        else
-        {
-            lineNumber++;
         }
     }
 }
@@ -400,8 +401,8 @@ int main()
     vector<string> lines = readFile(inputFileName);
 
     // Set $sp to the highest memory address
-    lines.insert(lines.begin(), "addi $sp, $zero, 159");
-    lines.insert(lines.begin(), "addi $io, $zero, 160");
+    lines.insert(lines.begin(), "addi $sp, $zero, -16");
+    lines.insert(lines.begin(), "addi $io, $zero, 240");
 
     if(is_pipelined) lines = updateLines(lines);
     updateLabelMaps(lines);
