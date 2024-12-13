@@ -3,6 +3,7 @@
 # 2($io) => UPDATE FLAG
 # 3($io) => FLUSH FLAG
 # 4($io) => KEYBOARD INPUT
+# 13($io) => Score Board
 # 14($io) => Debug Output 
 # 15($io) => RAND INPUT
 
@@ -51,11 +52,18 @@ game_loop:
     addi $t2, $zero, 0
     lw $t2, 4($io)
     andi $t2, $t2, 7 # keep lsb 3 bits, 111 UP, 100 RIGHT, 011 DOWN, 001 LEFT
- 
+
     # update snake direction
     # update snakes head
     lw $t0, 0($head) # x of head
     lw $t1, 1($head) # y of head
+
+    # key bind registers
+    addi $v0, $zero, 3 # UP
+    addi $v1, $zero, 4 # RIGHT
+    # not used else where so no need to init every time
+    # addi $v2, $zero, 7 # DOWN
+    # addi $v3, $zero, 1 # LEFT
 
     # update head position
     beq $t2, $v0, up
@@ -68,13 +76,16 @@ game_loop:
     beq $dir, $v3, left
     after_head_update:
 
-    # check if snake head is out of bounds
-
     # save head position
     addi $head, $head, 2 # move head to next position
     ori $head, $head, 192 # !! wrap around
     sw $t0, 0($head)
     sw $t1, 1($head)
+
+    # check if snake head is on snake body
+    addi $t2, $tail, 0 # loop index
+    j check_collision
+    after_check_collision:
 
     # check if snake head is on food
     beq $t0, $foodX, check_y # x position matches, now check y
@@ -89,9 +100,24 @@ game_loop:
 
     j game_loop
 
+check_collision:
+    lw $v0, 0($t2) # x of body part
+    lw $v1, 1($t2) # y of body part
+    beq $t0, $v0, check_collision_y # x position matches, now check y
+    after_check_collision_x:
+    addi $t2, $t2, 2 # next body
+    ori $t2, $t2, 192 # !! wrap around
+    bneq $t2, $head, check_collision # loop until tail
+    j after_check_collision
+
+check_collision_y:
+    beq $t1, $v1, exit # y position matches, game over
+    j after_check_collision_x
+
 check_y:
     bneq $t1, $foodY, food_not_eaten # y position does not match, food not eaten
     addi $score, $score, 1 # else y position matches, food eaten
+    sw $score, 13($io) # update score
     # get new random food position
     lw $foodX, 15($io)
     lw $foodY, 15($io)
@@ -133,6 +159,7 @@ init:
     addi $dir, $zero, 4 # initial direction right
     
     addi $score, $zero, 0 # initial score 0
+    sw $score, 13($io)
 
     addi $tail, $zero, 192
     addi $head, $tail, 6 # initial snake size 8
