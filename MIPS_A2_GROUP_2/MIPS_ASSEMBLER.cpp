@@ -356,7 +356,7 @@ int main()
 
     string inputFileName = path + filename;
     string outputFilename = binaryPath + "BIN_" + filename.substr(0, filename.find("."));
-    if(is_pipelined) outputFilename += "_pipelined";
+    if(is_pipelined) outputFilename += "_PIPELINED";
     outputFilename += ".txt";
 
     ifstream inputFile(inputFileName);

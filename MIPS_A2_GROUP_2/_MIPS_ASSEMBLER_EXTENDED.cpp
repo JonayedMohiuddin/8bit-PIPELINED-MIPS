@@ -384,7 +384,9 @@ int main()
     string filename = "SNAKE_GAME.mips";
 
     string inputFileName = path + filename;
-    string outputFilename = binaryPath + "BIN_" + filename.substr(0, filename.find(".")) + ".txt";
+    string outputFilename = binaryPath + "BIN_" + filename.substr(0, filename.find("."));
+    if(is_pipelined) outputFilename += "_PIPELINED";
+    outputFilename += ".txt";
 
     ifstream inputFile(inputFileName);
     ofstream outputFile(outputFilename);
