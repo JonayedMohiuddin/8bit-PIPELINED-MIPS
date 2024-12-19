@@ -112,29 +112,7 @@ This repository includes a playable **Snake Game** written in MIPS assembly. To 
 
 1. Assemble `SNAKE_GAME.mips` using the assembler.
 2. Load the generated binary file into the **Instruction ROM**.
-3. Connect the required I/O peripherals (e.g., keyboard and TTY) in Logisim.
-4. Run the simulation to start playing.
-
----
-
-## Non-Pipelined Version
-Non-pipelined versions of the MIPS processor are included for both normal and extended architectures, making debugging and testing more convenient.
-
----
-
-## Test Cases
-Various test cases are included in the repository, such as:
-
-- **Basic Pipeline Tests**: Test the pipeline functionality.
-- **Data Hazard Tests**: Verify handling of data hazards.
-- **Matrix Operations**: Perform matrix-related computations.
-- **Snake Game**: A playable implementation in MIPS assembly.
-- **Provided and Custom Test Cases**: For validation and demonstration.
-
----
-
-## Contributing
-Contributions are welcome! Feel free to submit issues or pull requests for improvements or bug fixes.
+4. Start simulation and set tick speed to 4.1 kHz. Enable tick and enjoy.
 
 ---
 
