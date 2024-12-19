@@ -71,8 +71,10 @@ The extended MIPS processor supports the following I/O peripherals:
 | 14      | Debug Output                     |
 | 15      | Random Input                     |
 
-How to use I/O peripherals:
+*How to use I/O peripherals:*
+
 To output data of `$t0` to a peripheral at port 1 use `lw $t0, 2($io)`
+
 To get input in `$t0` from a peripheral at port 4 use `sw $t0, 4($io)`
 
 ---
