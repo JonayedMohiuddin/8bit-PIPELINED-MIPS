@@ -1,7 +1,7 @@
 
 # 8-bit Pipelined MIPS Processor
 
-This repository contains an 8-bit MIPS(Microprocessor without Interlocked Pipelined Stages) processor designed in **Logisim**, supporting both pipelined and non-pipelined architectures. The project includes a custom assembler to convert MIPS assembly code into binary files for Logisim's instruction ROM. An extended version of the processor features I/O peripheral support, along with a playable **Snake Game** implemented in MIPS assembly.
+This repository contains an 8-bit MIPS (Microprocessor without Interlocked Pipelined Stages) processor designed in **Logisim**, supporting both pipelined and non-pipelined architectures. The project includes a custom assembler to convert MIPS assembly code into binary files for MIPS instruction ROM. An extended version of the processor features I/O peripheral support, along with a playable **Snake Game** implemented in MIPS assembly.
 
 ---
 
@@ -28,6 +28,30 @@ The MIPS processor supports the following instructions:
 | 13     | 1101   | Memory      | `lw`        | I      |
 | 14     | 1110   | Logic       | `or`        | R      |
 | 15     | 1111   | Control     | `j`         | J      |
+
+---
+
+### MIPS Instruction Set
+
+| Instruction    | Format    | Example                             | Description                                                    |
+|----------------|-----------|-------------------------------------|----------------------------------------------------------------|
+| `addi`         | I         | `addi dest_reg, src_reg, imm`       | Add immediate value `imm` to `src_reg`, store in `dest_reg` |
+| `sub`          | R         | `sub dest_reg, src_reg1, src_reg2`  | Subtract `src_reg2` from `src_reg1`, store result in `dest_reg` |
+| `srl`          | R         | `srl dest_reg, src_reg1, src_reg2`  | Shift `src_reg` right by `src_reg2` bits, store result in `dest_reg` |
+| `andi`         | I         | `andi dest_reg, src_reg, imm`       | Perform bitwise AND between `src_reg` and `imm`, store in `dest_reg` |
+| `ori`          | I         | `ori dest_reg, src_reg, imm`        | Perform bitwise OR between `src_reg` and `imm`, store in `dest_reg` |
+| `nor`          | R         | `nor dest_reg, src_reg1, src_reg2`  | Perform bitwise NOR between `src_reg1` and `src_reg2`, store in `dest_reg` |
+| `bneq`         | I         | `bneq src_reg1, src_reg2, label`    | Branch if `src_reg1` is not equal to `src_reg2`, to `label` |
+| `beq`          | I         | `beq src_reg1, src_reg2, label`     | Branch if `src_reg1` is equal to `src_reg2`, to `label`  |
+| `sw`           | I         | `sw src_reg, offset(base_reg)`      | Store word from `src_reg` to memory at address `base_reg + offset` |
+| `subi`         | I         | `subi dest_reg, src_reg, imm`       | Subtract immediate value `imm` from `src_reg`, store in `dest_reg` |
+| `addi`         | I         | `addi dest_reg, src_reg, imm`       | Add immediate value `imm` to `src_reg`, store in `dest_reg` |
+| `sll`          | R         | `sll dest_reg, src_reg, src_reg2`   | Shift `src_reg` left by `src_reg2` bits, store result in `dest_reg` |
+| `add`          | R         | `add dest_reg, src_reg1, src_reg2`  | Add `src_reg1` and `src_reg2`, store result in `dest_reg` |
+| `lw`           | I         | `lw dest_reg, offset(base_reg)`     | Load word from memory at address `base_reg + offset` into `dest_reg` |
+| `or`           | R         | `or dest_reg, src_reg1, src_reg2`   | Perform bitwise OR between `src_reg1` and `src_reg2`, store in `dest_reg` |
+| `j`            | J         | `j target`                          | Jump to address `target`                                 |
+
 
 ---
 
