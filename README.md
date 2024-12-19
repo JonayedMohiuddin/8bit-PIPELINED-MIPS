@@ -31,7 +31,7 @@ The MIPS processor supports the following instructions:
 
 ---
 
-### MIPS Instruction Set
+### Instruction Set Usages
 
 | Instruction    | Format    | Example                             | Description                                                    |
 |----------------|-----------|-------------------------------------|----------------------------------------------------------------|
@@ -66,9 +66,14 @@ The extended MIPS processor supports the following I/O peripherals:
 | 3       | Flush Flag                       |
 | 4       | Keyboard Input                   |
 | 5       | Text Output (TTY)                |
+| 6 - 12  | Unused (You can add yours)       |
 | 13      | Signed Decimal Output (7-Segment Display) |
 | 14      | Debug Output                     |
 | 15      | Random Input                     |
+
+How to use I/O peripherals:
+To output data of `$t0` to a peripheral at port 1 use `lw $t0, 2($io)`
+To get input in `$t0` from a peripheral at port 4 use `sw $t0, 4($io)`
 
 ---
 
