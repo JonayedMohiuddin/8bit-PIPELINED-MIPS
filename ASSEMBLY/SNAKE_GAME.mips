@@ -3,21 +3,23 @@
 # EMAIL   : jonayedmohiuddin@gmail.com
 # Intended to run by the 8-bit mips here : https://github.com/JonayedMohiuddin/8bit_MIPS
 
-# WIN  : Score more than 25
-# LOSE : Bite yourself
-# CONTROLS : w/W = UP, d/D = RIGHT, s/S = DOWN, a/A = LEFT
-# DISPLAY : 16 x 32 LED matrix and 2 x 7 digit display 
-# !! DISPLAY Caution: x is 5 bit and y is 4 bit
-
 # IO PORTS:
 # 0($io) => X ENABLE + DATA
 # 1($io) => Y ENABLE + DATA
 # 2($io) => UPDATE FLAG
 # 3($io) => FLUSH FLAG
 # 4($io) => KEYBOARD INPUT
-# 13($io) => SCORE BOARD
+# 5($io) => TEXT OUTPUT
+# 6($io) => TEXT SCREEN CLEAR FLAG
+# 13($io) => SIGNED DECIMAL OUTPUT DISPLAY (7 SEGMENT DISPLAY)
 # 14($io) => DEBUG OUTPUT 
 # 15($io) => RAND INPUT
+
+# WIN  : Score more than 25
+# LOSE : Bite yourself
+# CONTROLS : w/W = UP, d/D = RIGHT, s/S = DOWN, a/A = LEFT
+# DISPLAY : 16 x 32 LED matrix and 3 x 7 digit display 
+# !! DISPLAY Caution: x is 5 bit and y is 4 bit
 
 # REGISTERS:
 # $zero, $sp, $io, $t0, $t1, $t2, $t3, $t4, $v0, $v1, $v2, $v3, $s0, $s1, $s2, $s3
@@ -44,6 +46,8 @@
 # Snake body is a circular queue [start = tail, end = head] 
 
 main:
+    j introduction_message
+    after_introduction_message:
     # initialise values
     j init
     after_init:
@@ -133,10 +137,15 @@ check_collision:
     j after_check_collision
 
 check_collision_y:
-    sw $t1, 14($io) # debug output
-    sw $v1, 14($io) # debug output
-    beq $t1, $v1, exit # y position also matches, head body collision
+    # sw $t1, 14($io) # debug output
+    # sw $v1, 14($io) # debug output
+    beq $t1, $v1, snake_dead # y position also matches, head body collision    j death_message
     j after_check_collision_x
+
+snake_dead:
+    j death_message
+    after_death_message:
+    j init
 
 check_food_collision_y:
     bneq $t1, $foodY, food_not_eaten # y position does not match, food not eaten
@@ -155,7 +164,10 @@ check_food_collision_y:
     andi $t2, $t2, 128
     # sw $t2, 14($io) # debug output to check if negative works
     bneq $t2, $zero, food_eaten
-    j exit
+
+    j win_message
+    after_win_message:  
+    j init
 
 up:
     beq  $dir, $v2, down   # if current direction is down, then ignore up
@@ -234,5 +246,155 @@ draw_snake_loop:
     ori $t0, $t0, 192 # !! wrap around
 
     j draw_snake_loop 
+
+introduction_message:
+    # PRINT "Snake Game." on text screen decimal ascii
+    addi $t0, $zero, 83 # S
+    sw $t0, 5($io)
+    addi $t0, $zero, 110 # n
+    sw $t0, 5($io)
+    addi $t0, $zero, 97 # a
+    sw $t0, 5($io)
+    addi $t0, $zero, 107 # k
+    sw $t0, 5($io)
+    addi $t0, $zero, 101 # e
+    sw $t0, 5($io)
+    addi $t0, $zero, 32 # SPACE
+    sw $t0, 5($io)
+    addi $t0, $zero, 71 # G
+    sw $t0, 5($io)
+    addi $t0, $zero, 97 # a
+    sw $t0, 5($io)
+    addi $t0, $zero, 109 # m
+    sw $t0, 5($io)
+    addi $t0, $zero, 101 # e
+    sw $t0, 5($io)
+    addi $t0, $zero, 46 # .
+    sw $t0, 5($io)
+    addi $t0, $zero, 10 # NEW LINE
+    sw $t0, 5($io)
+
+    # print "Use 'Poke Tool' on keyboard to play." on text screen
+    addi $t0, $zero, 85 # U
+    sw $t0, 5($io)
+    addi $t0, $zero, 115 # s
+    sw $t0, 5($io)
+    addi $t0, $zero, 101 # e
+    sw $t0, 5($io)
+    addi $t0, $zero, 32 # SPACE
+    sw $t0, 5($io)
+    addi $t0, $zero, 39 # '
+    sw $t0, 5($io)
+    addi $t0, $zero, 80 # P
+    sw $t0, 5($io)
+    addi $t0, $zero, 111 # o
+    sw $t0, 5($io)
+    addi $t0, $zero, 107 # k
+    sw $t0, 5($io)
+    addi $t0, $zero, 101 # e
+    sw $t0, 5($io)
+    addi $t0, $zero, 32 # SPACE
+    sw $t0, 5($io)
+    addi $t0, $zero, 84 # T
+    sw $t0, 5($io)
+    addi $t0, $zero, 111 # o
+    sw $t0, 5($io)
+    addi $t0, $zero, 111 # o
+    sw $t0, 5($io)
+    addi $t0, $zero, 108 # l
+    sw $t0, 5($io)
+    addi $t0, $zero, 39 # '
+    sw $t0, 5($io)
+    addi $t0, $zero, 32 # SPACE
+    sw $t0, 5($io)
+    addi $t0, $zero, 111 # o
+    sw $t0, 5($io)
+    addi $t0, $zero, 110 # n
+    sw $t0, 5($io)
+    addi $t0, $zero, 32 # SPACE
+    sw $t0, 5($io)
+    addi $t0, $zero, 107 # k
+    sw $t0, 5($io)
+    addi $t0, $zero, 101 # e
+    sw $t0, 5($io)
+    addi $t0, $zero, 121 # y
+    sw $t0, 5($io)
+    addi $t0, $zero, 98 # b
+    sw $t0, 5($io)
+    addi $t0, $zero, 111 # o
+    sw $t0, 5($io)
+    addi $t0, $zero, 97 # a
+    sw $t0, 5($io)
+    addi $t0, $zero, 114 # r
+    sw $t0, 5($io)
+    addi $t0, $zero, 100 # d
+    sw $t0, 5($io)
+    addi $t0, $zero, 32 # SPACE
+    sw $t0, 5($io)
+    addi $t0, $zero, 116 # t
+    sw $t0, 5($io)
+    addi $t0, $zero, 111 # o
+    sw $t0, 5($io)
+    addi $t0, $zero, 10 # NEW LINE
+    sw $t0, 5($io)
+    addi $t0, $zero, 112 # p
+    sw $t0, 5($io)
+    addi $t0, $zero, 108 # l
+    sw $t0, 5($io)
+    addi $t0, $zero, 97 # a
+    sw $t0, 5($io)
+    addi $t0, $zero, 121 # y
+    sw $t0, 5($io)
+    addi $t0, $zero, 46 # .
+    sw $t0, 5($io)
+    addi $t0, $zero, 10 # NEW LINE
+    sw $t0, 5($io)
+    j after_introduction_message
+
+death_message:
+    # print "You Lost." on text screen
+    addi $t0, $zero, 89 # Y
+    sw $t0, 5($io)
+    addi $t0, $zero, 111 # o
+    sw $t0, 5($io)
+    addi $t0, $zero, 117 # u
+    sw $t0, 5($io)
+    addi $t0, $zero, 32 # SPACE
+    sw $t0, 5($io)
+    addi $t0, $zero, 76 # L
+    sw $t0, 5($io)
+    addi $t0, $zero, 111 # o
+    sw $t0, 5($io)
+    addi $t0, $zero, 115 # s
+    sw $t0, 5($io)
+    addi $t0, $zero, 116 # t
+    sw $t0, 5($io)
+    addi $t0, $zero, 46 # .
+    sw $t0, 5($io)
+    addi $t0, $zero, 10 # NEW LINE
+    sw $t0, 5($io)
+    j after_death_message
+
+win_message:
+    # print "You Won." on text screen
+    addi $t0, $zero, 89 # Y
+    sw $t0, 5($io)
+    addi $t0, $zero, 111 # o
+    sw $t0, 5($io)
+    addi $t0, $zero, 117 # u
+    sw $t0, 5($io)
+    addi $t0, $zero, 32 # SPACE
+    sw $t0, 5($io)
+    addi $t0, $zero, 87 # W
+    sw $t0, 5($io)
+    addi $t0, $zero, 111 # o
+    sw $t0, 5($io)
+    addi $t0, $zero, 110 # n
+    sw $t0, 5($io)
+    addi $t0, $zero, 46 # .
+    sw $t0, 5($io)
+    addi $t0, $zero, 10 # NEW LINE
+    sw $t0, 5($io)
+    j after_win_message
 
 exit:

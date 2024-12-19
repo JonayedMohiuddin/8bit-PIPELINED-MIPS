@@ -1,8 +1,3 @@
-# 0($io) => X ENABLE + DATA
-# 1($io) => Y ENABLE + DATA
-# 2($io) => UPDATE FLAG
-# 3($io) => FLUSH FLAG
-# 15($io) => RAND INPUT
 
 addi $t2, $zero 32
 addi $t0, $zero, 0 # initial x at 0

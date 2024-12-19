@@ -25,13 +25,13 @@ unordered_map<string, string> registerMap = {
     {"$zero", "0000"},
 
     {"$t0", "0001"}, {"$t1", "0010"}, {"$t2", "0011"}, 
-    // {"$t3", "0100"}, {"$t4", "0101"}, 
+    {"$t3", "0100"}, {"$t4", "0101"}, 
     
     {"$sp", "0110"}, 
     
     {"$v0", "0111"}, {"$v1", "1000"}, {"$v2", "1001"}, {"$v3", "1010"},
     
-    // {"$s0", "1011"}, {"$s1", "1100"}, {"$s2", "1101"}, {"$s3", "1110"}, 
+    {"$s0", "1011"}, {"$s1", "1100"}, {"$s2", "1101"}, {"$s3", "1110"}, 
     
     {"$io", "1111"},
 
@@ -433,7 +433,14 @@ int main()
 
     cerr << endl;
     cerr << "Binary conversion completed." << endl;
+    cout << "TOTAL BYTES: " << lineNumber << endl;
     cerr << "Output file: " << outputFilename << endl;
+    
+    // instruction memory is 8 bit wide, so only 256 instructions can be stored
+    if(lineNumber > 256)
+    {
+        cerr << "!! Instruction memory overflow. Only 256 instructions are allowed." << endl;
+    }
 
     return 0;
 }
