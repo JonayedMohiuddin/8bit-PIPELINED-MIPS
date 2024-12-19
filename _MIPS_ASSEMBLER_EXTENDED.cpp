@@ -378,9 +378,9 @@ string getBinary(vector<string> tokens, int lineNumber)
 
 int main()
 {
-    string path = "D:\\CSE_CourseMaterials\\CSES 210 - ARCHITECTURE SESSIONAL\\MIPS_Assignment_03\\ASSEMBLY\\";
-    string binaryPath = "D:\\CSE_CourseMaterials\\CSES 210 - ARCHITECTURE SESSIONAL\\MIPS_Assignment_03\\BINARY\\";
-
+    string path = "ASSEMBLY\\";
+    string binaryPath = "BINARY\\";
+    
     string filename = "SNAKE_GAME.mips";
 
     string inputFileName = path + filename;

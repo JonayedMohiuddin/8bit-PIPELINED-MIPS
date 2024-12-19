@@ -133,6 +133,8 @@ check_collision:
     j after_check_collision
 
 check_collision_y:
+    sw $t1, 14($io) # debug output
+    sw $v1, 14($io) # debug output
     beq $t1, $v1, exit # y position also matches, head body collision
     j after_check_collision_x
 
@@ -148,10 +150,10 @@ check_food_collision_y:
     
     # if score > 25 then game over with win
     subi $t2, $score, 26 # subtract from max score to check if greater than max score
-    sw $t2, 14($io)
+    # sw $t2, 14($io) # debug output 
     # and with 10000000 to check if negative
     andi $t2, $t2, 128
-    sw $t2, 14($io)
+    # sw $t2, 14($io) # debug output to check if negative works
     bneq $t2, $zero, food_eaten
     j exit
 

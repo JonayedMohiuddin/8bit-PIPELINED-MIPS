@@ -1,7 +1,7 @@
 #include <bits/stdc++.h>
 using namespace std;
 
-bool is_pipelined = true;
+bool is_pipelined = false;
 
 // Map for opcodes
 unordered_map<string, string> opcodeMap = {
@@ -349,10 +349,10 @@ string getBinary(vector<string> tokens, int lineNumber)
 
 int main()
 {
-    string path = "D:\\CSE_CourseMaterials\\CSES 210 - ARCHITECTURE SESSIONAL\\MIPS_Assignment_03\\ASSEMBLY\\";
-    string binaryPath = "D:\\CSE_CourseMaterials\\CSES 210 - ARCHITECTURE SESSIONAL\\MIPS_Assignment_03\\BINARY\\";
+    string path = "ASSEMBLY\\";
+    string binaryPath = "BINARY\\";
 
-    string filename = "tushar_sir.mips";
+    string filename = "PIPELINE_TEST.mips";
 
     string inputFileName = path + filename;
     string outputFilename = binaryPath + "BIN_" + filename.substr(0, filename.find("."));

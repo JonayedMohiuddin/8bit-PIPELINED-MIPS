@@ -1,0 +1,21 @@
+addi $t0, $zero, 1
+addi $t1, $zero, 2
+nop
+nop
+nop
+sw $t0, 0($zero)
+nop
+nop
+nop
+lw $t2, 0($zero)
+sw $t2, 1($zero)
+
+# addi $t1, $zero, 11
+# addi $t0, $zero, 11
+# sw $t0, 0($zero)
+# lw $t0, 0($zero)
+# beq $t0, $t1, here
+# addi $t2, $zero, -22
+
+# here:
+# addi $t3, $zero, 22
