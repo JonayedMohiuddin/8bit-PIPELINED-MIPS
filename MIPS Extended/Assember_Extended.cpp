@@ -13,10 +13,26 @@ unordered_map<string, string> opcodeMap = {
     {"nop", "0000"},
 };
 
+// unordered_map<string, string> registerMap = {
+//     {"$zero", "0000"}, {"$t1", "0001"}, {"$t2", "0010"}, 
+//     {"$t3", "0011"}, {"$t4", "0100"}, {"$t0", "0101"}, 
+//     {"$sp", "0110"}};
+
+// Map for registers
 unordered_map<string, string> registerMap = {
-    {"$zero", "0000"}, {"$t1", "0001"}, {"$t2", "0010"}, 
+    {"$zero", "0000"}, 
+    
+    {"$t1", "0001"}, {"$t2", "0010"}, 
     {"$t3", "0011"}, {"$t4", "0100"}, {"$t0", "0101"}, 
-    {"$sp", "0110"}};
+    
+    {"$sp", "0110"},
+    
+    {"$v0", "0111"}, {"$v1", "1000"}, {"$v2", "1001"}, {"$v3", "1010"},
+    
+    {"$s0", "1011"}, {"$s1", "1100"}, {"$s2", "1101"}, {"$s3", "1110"}, 
+    
+    {"$io", "1111"},
+};
 
 
 // Map for labels
@@ -357,10 +373,10 @@ string getBinary(vector<string> tokens, int lineNumber)
 
 int main()
 {
-    string path = "ASSEMBLY\\";
-    string binaryPath = "BINARY\\";
+    string path = "..\\ASSEMBLY\\";
+    string binaryPath = "..\\BINARY\\";
     
-    string filename = "PIPELINE_TEST.mips";
+    string filename = "SNAKE_GAME.mips";
 
     string inputFileName = path + filename;
     string outputFilename = binaryPath + "BIN_" + filename.substr(0, filename.find("."));
@@ -380,7 +396,8 @@ int main()
     vector<string> lines = readFile(inputFileName);
 
     // Set $sp to the highest memory address available
-    lines.insert(lines.begin(), "addi $sp, $zero, -1");
+    lines.insert(lines.begin(), "addi $sp, $zero, 159");
+    lines.insert(lines.begin(), "addi $io, $zero, 160");
 
     lines = renameRegisters(lines);
     updateLabelMaps(lines);

@@ -357,10 +357,10 @@ string getBinary(vector<string> tokens, int lineNumber)
 
 int main()
 {
-    string path = "ASSEMBLY\\";
-    string binaryPath = "BINARY\\";
+    string path = "..\\ASSEMBLY\\";
+    string binaryPath = "..\\BINARY\\";
     
-    string filename = "PIPELINE_TEST.mips";
+    string filename = "SNAKE_GAME.mips";
 
     string inputFileName = path + filename;
     string outputFilename = binaryPath + "BIN_" + filename.substr(0, filename.find("."));
