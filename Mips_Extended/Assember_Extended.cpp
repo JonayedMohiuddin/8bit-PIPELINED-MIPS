@@ -34,11 +34,22 @@ unordered_map<string, string> registerMap = {
     {"$io", "1111"},
 };
 
-
 // Map for labels
 unordered_map<string, int> labelMap;
 
 string nop_binary = opcodeMap["nop"] + registerMap["$zero"] + registerMap["$zero"] + registerMap["$zero"] + "0000";
+
+// IO PORTS:
+// 0($io) => X ENABLE + DATA
+// 1($io) => Y ENABLE + DATA
+// 2($io) => UPDATE FLAG
+// 3($io) => FLUSH FLAG
+// 4($io) => KEYBOARD INPUT
+// 5($io) => TEXT OUTPUT (TTY)
+// ...    => UNUSED
+// 13($io) => SIGNED DECIMAL OUTPUT DISPLAY (7 SEGMENT DISPLAY)
+// 14($io) => DEBUG OUTPUT 
+// 15($io) => RAND INPUT
 
 
 void checkValidRegister(const string &reg)
@@ -373,21 +384,26 @@ string getBinary(vector<string> tokens, int lineNumber)
 
 int main()
 {
-    string path = "..\\ASSEMBLY\\";
-    string binaryPath = "..\\BINARY\\";
+    string path = "ASSEMBLY\\";
+    string binaryPath = "BINARY\\";
     
-    string filename = "SNAKE_GAME.mips";
+    string filename = "RANDOM_MATRIX.mips";
 
     string inputFileName = path + filename;
     string outputFilename = binaryPath + "BIN_" + filename.substr(0, filename.find("."));
     outputFilename += ".txt";
 
     ifstream inputFile(inputFileName);
-    ofstream outputFile(outputFilename);
-
-    if (!inputFile.is_open() || !outputFile.is_open())
+    if (!inputFile.is_open())
     {
-        cerr << "Error opening file." << endl;
+        cerr << "Error opening file. " << inputFileName  << endl;
+        return 1;
+    }
+
+    ofstream outputFile(outputFilename);
+    if(!outputFile.is_open())
+    {
+        cerr << "Error creating output file. " << outputFilename << endl;
         return 1;
     }
 
@@ -402,10 +418,7 @@ int main()
     lines = renameRegisters(lines);
     updateLabelMaps(lines);
 
-    // for (string line : lines)
-    // {
-    //     cerr << line << endl;
-    // }
+    // for (string line : lines) cerr << line << endl;
 
     int lineNumber = 0;
     for (string line : lines)

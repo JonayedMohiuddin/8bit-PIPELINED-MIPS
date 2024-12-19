@@ -367,11 +367,16 @@ int main()
     outputFilename += ".txt";
 
     ifstream inputFile(inputFileName);
-    ofstream outputFile(outputFilename);
-
-    if (!inputFile.is_open() || !outputFile.is_open())
+    if (!inputFile.is_open())
     {
-        cerr << "Error opening file." << endl;
+        cerr << "Error opening file. " << inputFileName  << endl;
+        return 1;
+    }
+
+    ofstream outputFile(outputFilename);
+    if(!outputFile.is_open())
+    {
+        cerr << "Error creating output file. " << outputFilename << endl;
         return 1;
     }
 
@@ -385,10 +390,7 @@ int main()
     lines = renameRegisters(lines);
     updateLabelMaps(lines);
 
-    // for (string line : lines)
-    // {
-    //     cerr << line << endl;
-    // }
+    // for (string line : lines) cerr << line << endl; 
 
     int lineNumber = 0;
     for (string line : lines)
