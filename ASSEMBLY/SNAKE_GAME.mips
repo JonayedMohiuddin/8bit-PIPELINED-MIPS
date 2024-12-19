@@ -3,34 +3,23 @@
 # EMAIL   : jonayedmohiuddin@gmail.com
 # Intended to run by the 8-bit mips here : https://github.com/JonayedMohiuddin/8bit_MIPS
 
+# WIN  : Score more than 25
+# LOSE : Bite yourself
+# CONTROLS : w/W = UP, d/D = RIGHT, s/S = DOWN, a/A = LEFT
+# DISPLAY : 16 x 32 LED matrix, 3 x 7 digit display and TTY text screen 
+# !! DISPLAY Caution: x is 5 bit and y is 4 bit 
+
 # IO PORTS:
 # 0($io) => X ENABLE + DATA
 # 1($io) => Y ENABLE + DATA
 # 2($io) => UPDATE FLAG
 # 3($io) => FLUSH FLAG
 # 4($io) => KEYBOARD INPUT
-# 5($io) => TEXT OUTPUT
-# 6($io) => TEXT SCREEN CLEAR FLAG
+# 5($io) => TEXT OUTPUT (TTY)
+# ...    => UNUSED
 # 13($io) => SIGNED DECIMAL OUTPUT DISPLAY (7 SEGMENT DISPLAY)
 # 14($io) => DEBUG OUTPUT 
 # 15($io) => RAND INPUT
-
-# WIN  : Score more than 25
-# LOSE : Bite yourself
-# CONTROLS : w/W = UP, d/D = RIGHT, s/S = DOWN, a/A = LEFT
-# DISPLAY : 16 x 32 LED matrix and 3 x 7 digit display 
-# !! DISPLAY Caution: x is 5 bit and y is 4 bit
-
-# REGISTERS:
-# $zero, $sp, $io, $t0, $t1, $t2, $t3, $t4, $v0, $v1, $v2, $v3, $s0, $s1, $s2, $s3
-# Renamed : $t3 -> head, $t4 -> tail, $s0 -> $dir, $s1 -> $score, $s2 -> $foodX, $s3 -> $foodY
-
-# t3 = head 
-# t4 = tail
-# $s0 = direction of snake head
-# s1 = score
-# s2 = x of food
-# s3 = y of food
 
 # Control Mapping:
 # 011 = w/W = UP = 3
@@ -44,6 +33,21 @@
 # 192 - 255 : to make wrapping just or with 11000000 = -64 or 192
 
 # Snake body is a circular queue [start = tail, end = head] 
+
+# REGISTERS:
+# $zero, $sp, $io, $t0, $t1, $t2, $t3, $t4, $v0, $v1, $v2, $v3, $s0, $s1, $s2, $s3
+# Renamed : $t3 -> head, $t4 -> tail, $s0 -> $dir, $s1 -> $score, $s2 -> $foodX, $s3 -> $foodY
+
+# NON STANDARD MIPS INSTRUCTIONS:
+# RENAMING REGISTERS FOR EASE OF USE
+# USE @ TO RENAME REGISTERS [@ old_name new_name]
+@ t3 head  # position(index) of head on memory
+@ t4 tail  # position(index) of tail on memory
+@ s0 dir   # direction of snake [3 = UP, 4 = RIGHT, 7 = DOWN, 1 = LEFT]
+@ s1 score 
+@ s2 foodX
+@ s3 foodY
+
 
 main:
     j introduction_message
@@ -203,7 +207,7 @@ init:
     addi $dir, $zero, 4 # initial direction = right
     
     addi $score, $zero, 0 # initial score = 0
-    sw $score, 13($io)    # send score to 7 digit display
+    sw $score, 13($io)    # send score to 7 segment display
 
     addi $tail, $zero, 192 # tail start from meomory location 192
     addi $head, $tail, 6   # initial snake size is 3 (but x and y are 2 bytes)

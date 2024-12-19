@@ -1,8 +1,6 @@
 #include <bits/stdc++.h>
 using namespace std;
 
-bool is_pipelined = false;
-
 // Map for opcodes
 unordered_map<string, string> opcodeMap = {
     {"sub", "0000"},  {"srl", "0001"},  {"andi", "0010"}, 
@@ -22,26 +20,18 @@ unordered_map<string, string> opcodeMap = {
 
 // Map for registers
 unordered_map<string, string> registerMap = {
-    {"$zero", "0000"},
-
-    {"$t0", "0001"}, {"$t1", "0010"}, {"$t2", "0011"}, 
-    {"$t3", "0100"}, {"$t4", "0101"}, 
+    {"$zero", "0000"}, 
     
-    {"$sp", "0110"}, 
+    {"$t1", "0001"}, {"$t2", "0010"}, 
+    {"$t3", "0011"}, {"$t4", "0100"}, {"$t0", "0101"}, 
+    
+    {"$sp", "0110"},
     
     {"$v0", "0111"}, {"$v1", "1000"}, {"$v2", "1001"}, {"$v3", "1010"},
     
     {"$s0", "1011"}, {"$s1", "1100"}, {"$s2", "1101"}, {"$s3", "1110"}, 
     
     {"$io", "1111"},
-
-    // Same registers just for the sake of readability renamed them
-    {"$head", "0100"},  // $t3
-    {"$tail", "0101"},  // $t4
-    {"$dir", "1011"},   // $s0
-    {"$score", "1100"}, // $s1
-    {"$foodX", "1101"}, // $s2
-    {"$foodY", "1110"}  // $s3
 };
 
 
@@ -141,12 +131,10 @@ vector<string> tokenizer(string line)
     return tokens;
 }
 
-vector<string> updateLines(vector<string> lines)
+vector<string> renameRegisters(vector<string> lines)
 {
     vector<string> filteredLines;
 
-    // insert 3 nop before and 3 after beq and bneq for pipeline support
-    // insert 1 nop before and 1 after j for pipeline support
     for (int i = 0; i < lines.size(); i++)
     {
         string line = lines[i];
@@ -154,25 +142,32 @@ vector<string> updateLines(vector<string> lines)
 
         if (tokens.size() > 0)
         {
-            if (tokens[0] == "beq" || tokens[0] == "bneq")
+            if(tokens[0].size() > 0 && tokens[0][0] == '@')
             {
-                filteredLines.push_back("nop");
-                filteredLines.push_back("nop");
-                filteredLines.push_back("nop");
+                // @ is used to rename registers like
+                // @ t3 head
+                if(tokens.size() < 3)
+                {
+                    cerr << "!! Invalid number of arguments for @ instruction." << endl;
+                    exit(1);
+                }
+ 
+                string oldNameReg = "$" + tokens[1];
+                string newNameReg = "$" + tokens[2];
 
-                filteredLines.push_back(line);
+                if(registerMap.find(oldNameReg) == registerMap.end())
+                {
+                    cerr << "!! Invalid register name: " << oldNameReg << endl;
+                    cerr << "!! Cant rename register. Exiting..." << endl;
+                    exit(1);
+                }
 
-                filteredLines.push_back("nop");
-                filteredLines.push_back("nop");
-                filteredLines.push_back("nop");
-            }
-            else if (tokens[0] == "j")
-            {
-                filteredLines.push_back("nop");
-
-                filteredLines.push_back(line);
-
-                filteredLines.push_back("nop");                 
+                if(oldNameReg != newNameReg)
+                {
+                    // Set the binary of the new register to the binary of the old register
+                    registerMap[newNameReg] = registerMap[oldNameReg];
+                    registerMap.erase(oldNameReg);
+                }
             }
             else    
             {
@@ -385,7 +380,6 @@ int main()
 
     string inputFileName = path + filename;
     string outputFilename = binaryPath + "BIN_" + filename.substr(0, filename.find("."));
-    if(is_pipelined) outputFilename += "_PIPELINED";
     outputFilename += ".txt";
 
     ifstream inputFile(inputFileName);
@@ -401,11 +395,11 @@ int main()
 
     vector<string> lines = readFile(inputFileName);
 
-    // Set $sp to the highest memory address
+    // Set $sp to the highest memory address available
     lines.insert(lines.begin(), "addi $sp, $zero, 159");
     lines.insert(lines.begin(), "addi $io, $zero, 160");
 
-    if(is_pipelined) lines = updateLines(lines);
+    lines = renameRegisters(lines);
     updateLabelMaps(lines);
 
     // for (string line : lines)

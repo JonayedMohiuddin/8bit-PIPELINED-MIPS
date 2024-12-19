@@ -3803,7 +3803,6 @@ c40 501 500 505 900 780 902 8
     <wire from="(330,870)" to="(420,870)"/>
     <wire from="(620,420)" to="(830,420)"/>
     <wire from="(330,730)" to="(350,730)"/>
-    <wire from="(400,160)" to="(420,160)"/>
     <wire from="(170,490)" to="(190,490)"/>
     <wire from="(170,570)" to="(190,570)"/>
     <wire from="(270,200)" to="(280,200)"/>
@@ -3850,6 +3849,7 @@ c40 501 500 505 900 780 902 8
     <wire from="(1010,590)" to="(1070,590)"/>
     <wire from="(400,150)" to="(400,160)"/>
     <wire from="(260,820)" to="(260,1020)"/>
+    <wire from="(410,160)" to="(410,170)"/>
     <wire from="(870,180)" to="(870,460)"/>
     <wire from="(1070,580)" to="(1070,590)"/>
     <wire from="(90,480)" to="(190,480)"/>
@@ -3894,6 +3894,7 @@ c40 501 500 505 900 780 902 8
     <wire from="(330,960)" to="(350,960)"/>
     <wire from="(370,90)" to="(370,130)"/>
     <wire from="(230,540)" to="(250,540)"/>
+    <wire from="(400,160)" to="(410,160)"/>
     <wire from="(210,410)" to="(210,460)"/>
     <wire from="(370,130)" to="(380,130)"/>
     <wire from="(940,690)" to="(1010,690)"/>
@@ -3909,7 +3910,6 @@ c40 501 500 505 900 780 902 8
     <wire from="(270,280)" to="(320,280)"/>
     <wire from="(1010,690)" to="(1070,690)"/>
     <wire from="(330,740)" to="(380,740)"/>
-    <wire from="(430,200)" to="(430,210)"/>
     <wire from="(330,880)" to="(450,880)"/>
     <wire from="(90,180)" to="(140,180)"/>
     <wire from="(370,140)" to="(370,150)"/>
@@ -3937,7 +3937,6 @@ c40 501 500 505 900 780 902 8
     <wire from="(620,530)" to="(940,530)"/>
     <wire from="(620,400)" to="(810,400)"/>
     <wire from="(330,790)" to="(380,790)"/>
-    <wire from="(420,160)" to="(420,170)"/>
     <wire from="(620,270)" to="(680,270)"/>
     <wire from="(330,850)" to="(450,850)"/>
     <wire from="(520,260)" to="(520,290)"/>
@@ -4105,6 +4104,10 @@ c40 501 500 505 900 780 902 8
     </comp>
     <comp lib="4" loc="(940,690)" name="Register"/>
     <comp lib="0" loc="(1180,140)" name="Ground"/>
+    <comp lib="0" loc="(410,170)" name="Tunnel">
+      <a name="facing" val="north"/>
+      <a name="label" val="CLR"/>
+    </comp>
     <comp loc="(330,730)" name="BCD to 7 Segment Display"/>
     <comp lib="6" loc="(1102,304)" name="Text">
       <a name="text" val="KEYBOARD"/>
@@ -4262,11 +4265,6 @@ c40 501 500 505 900 780 902 8
     <comp lib="0" loc="(940,730)" name="Tunnel">
       <a name="facing" val="north"/>
       <a name="label" val="CLR"/>
-    </comp>
-    <comp lib="1" loc="(420,170)" name="OR Gate">
-      <a name="facing" val="north"/>
-      <a name="size" val="30"/>
-      <a name="inputs" val="2"/>
     </comp>
     <comp loc="(620,610)" name="Random Number Generator"/>
     <comp lib="0" loc="(380,740)" name="Tunnel">
@@ -4452,10 +4450,6 @@ c40 501 500 505 900 780 902 8
     <comp lib="0" loc="(1130,160)" name="Tunnel">
       <a name="facing" val="north"/>
       <a name="label" val="U"/>
-    </comp>
-    <comp lib="0" loc="(430,210)" name="Tunnel">
-      <a name="facing" val="north"/>
-      <a name="label" val="CLR"/>
     </comp>
     <comp loc="(620,230)" name="16 x 32 Display Adapter"/>
   </circuit>
