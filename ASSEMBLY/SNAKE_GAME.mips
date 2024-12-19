@@ -9,7 +9,7 @@
 # DISPLAY : 16 x 32 LED matrix, 3 x 7 digit display and TTY text screen 
 # !! DISPLAY Caution: x is 5 bit and y is 4 bit 
 
-# IO PORTS:
+# IO PORTS: 
 # 0($io) => X ENABLE + DATA
 # 1($io) => Y ENABLE + DATA
 # 2($io) => UPDATE FLAG
