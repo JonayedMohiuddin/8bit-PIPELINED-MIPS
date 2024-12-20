@@ -14,6 +14,7 @@
 # 13($io) => SIGNED DECIMAL OUTPUT DISPLAY (7 SEGMENT DISPLAY)
 # 14($io) => DEBUG OUTPUT 
 # 15($io) => RAND INPUT
+# !! DISPLAY Caution: x is 5 bit and y is 4 bit 
 
 addi $t2, $zero 32
 addi $t0, $zero, 0 # initial x at 0
@@ -21,6 +22,7 @@ draw:
 
 repeat:
 lw $t1, 15($io) # load random input for y value
+andi $t1, $t1, 15 # display y value is 4 bit
 sw $t0, 0($io) # store x value
 sw $t1, 1($io) # store y value
 sw $zero, 2($io) # update flag

@@ -1,6 +1,6 @@
 @echo off
 :: Display the options
-echo Logisim might give The required library file 'ALUjar' is missing. Please select the file from the following dialog. error. Just select the ALU.jar from directory.
+echo Logisim might give "The required library file 'ALUjar' is missing. Please select the file from the following dialog." error. Just select the ALU.jar from directory.
 echo Choose a circuit to run:
 echo 1. MIPS
 echo 2. Pipelined MIPS
@@ -35,4 +35,4 @@ if not exist "logisim-generic-2.7.1.jar" (
 )
 
 :: Run Logisim with the selected .circ file
-java -jar logisim-generic-2.7.1.jar "%circuit%"
+java -jar logisim-generic-2.7.1.jar "%circuit%" -sub ALU.jar ALU.jar

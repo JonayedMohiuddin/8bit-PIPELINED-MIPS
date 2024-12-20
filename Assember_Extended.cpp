@@ -190,7 +190,7 @@ vector<string> renameRegisters(vector<string> lines)
     return filteredLines;
 }
 
-void updateLabelMaps(vector<string> lines)
+void updateLabelMaps(vector<string> lines, bool debug = false)
 {
     int lineNumber = 0;
     for (string line : lines)
@@ -204,7 +204,7 @@ void updateLabelMaps(vector<string> lines)
             string label = tokens[0].substr(0, tokens[0].size() - 1);
             labelMap[label] = lineNumber;
 
-            cerr << "Label: " << label << " at line: " << lineNumber << endl;
+            if(debug) cerr << "Label: " << label << " at line: " << lineNumber << endl;
         }
         else
         {
@@ -213,7 +213,7 @@ void updateLabelMaps(vector<string> lines)
     }
 }
 
-string getBinary(vector<string> tokens, int lineNumber)
+string getBinary(vector<string> tokens, int lineNumber, bool debug = false)
 {
     string opcode = opcodeMap[tokens[0]];
     string binary = "";
@@ -222,7 +222,8 @@ string getBinary(vector<string> tokens, int lineNumber)
     {
         // NOP : sub $zero, $zero, $zer
         binary = nop_binary;
-        cerr << opcode << " " << registerMap["$zero"] << " " << registerMap["$zero"] << " " << registerMap["$zero"] << " " << "0000" << endl;
+        
+        if(debug) cerr << opcode << " " << registerMap["$zero"] << " " << registerMap["$zero"] << " " << registerMap["$zero"] << " " << "0000" << endl;
     }
     else if (tokens[0] == "j")
     {
@@ -248,7 +249,7 @@ string getBinary(vector<string> tokens, int lineNumber)
 
         binary = opcode + toBinary(address, 8) + "00000000";
         
-        cerr << "JMP " << opcode << " " << toBinary(address, 8) << " " << "00000000" << endl;
+        if(debug) cerr << "JMP " << opcode << " " << toBinary(address, 8) << " " << "00000000" << endl;
     }
     else if (tokens[0] == "sub" || tokens[0] == "and" || tokens[0] == "or" || 
              tokens[0] == "nor" || tokens[0] == "add") 
@@ -271,7 +272,7 @@ string getBinary(vector<string> tokens, int lineNumber)
 
         binary = opcode + registerMap[rs] + registerMap[rt] + registerMap[rd] + "0000";
 
-        cerr << tokens[0] << " " << opcode << " " << registerMap[rs] << " " << registerMap[rt] << " " << registerMap[rd] << " " << "0000" << endl;
+        if(debug) cerr << tokens[0] << " " << opcode << " " << registerMap[rs] << " " << registerMap[rt] << " " << registerMap[rd] << " " << "0000" << endl;
     }
     else if (tokens[0] == "srl" || tokens[0] == "sll")
     {
@@ -296,7 +297,7 @@ string getBinary(vector<string> tokens, int lineNumber)
         // WHEN SHIFTING USE RS AS NUMBER , RT AS DESTINATION REGISTER , SHIFT AMOUNT AS SHIFT AMOUNT
         binary = opcode + registerMap[rt] + registerMap[rd] + toBinary(shiftAmount, 8);
 
-        cerr << tokens[0] << " " << opcode << " " << registerMap[rt] << " " << registerMap[rd] << " " << toBinary(shiftAmount, 8) << endl;
+        if(debug) cerr << tokens[0] << " " << opcode << " " << registerMap[rt] << " " << registerMap[rd] << " " << toBinary(shiftAmount, 8) << endl;
     }
     else if(tokens[0] == "addi" || tokens[0] == "subi" || 
             tokens[0] == "andi" || tokens[0] == "ori")
@@ -320,7 +321,7 @@ string getBinary(vector<string> tokens, int lineNumber)
 
         binary = opcode + registerMap[rs] + registerMap[rt] + toBinary(immediate, 8);
 
-        cerr << tokens[0] << " " << opcode << " " << registerMap[rs] << " " << registerMap[rt] << " " << toBinary(immediate, 8) << endl;
+        if(debug) cerr << tokens[0] << " " << opcode << " " << registerMap[rs] << " " << registerMap[rt] << " " << toBinary(immediate, 8) << endl;
     }
     else if(tokens[0] == "lw" || tokens[0] == "sw")
     {
@@ -345,7 +346,7 @@ string getBinary(vector<string> tokens, int lineNumber)
         // binaryInstruction = opcode + registerMap[rs] + registerMap[rt] + toBinary(immediate, 8);
         binary = opcode + registerMap[rs] + registerMap[rt] + toBinary(immediate, 8);
 
-        cerr << tokens[0] << " " << opcode << " " << registerMap[rs] << " " << registerMap[rt] << " " << toBinary(immediate, 8) << endl;
+        if(debug) cerr << tokens[0] << " " << opcode << " " << registerMap[rs] << " " << registerMap[rt] << " " << toBinary(immediate, 8) << endl;
     }
     else if(tokens[0] == "beq" || tokens[0] == "bneq")
     {
@@ -373,7 +374,7 @@ string getBinary(vector<string> tokens, int lineNumber)
         if(offset < 0) offset = 256 + offset;
 
         binary = opcode + registerMap[rs] + registerMap[rt] + toBinary(offset, 8);
-        cerr << tokens[0] << " " << opcode << " " << registerMap[rs] << " " << registerMap[rt] << " " << toBinary(offset, 8) << endl;
+        if(debug) cerr << tokens[0] << " " << opcode << " " << registerMap[rs] << " " << registerMap[rt] << " " << toBinary(offset, 8) << endl;
     }
     else { 
         // DO NOTHING
@@ -382,17 +383,8 @@ string getBinary(vector<string> tokens, int lineNumber)
     return binary;
 }
 
-int main()
+int assembleFile(string inputFileName, string outputFileName, bool debug = false)
 {
-    string path = "ASSEMBLY\\";
-    string binaryPath = "BINARY\\";
-    
-    string filename = "SNAKE_GAME.mips";
-
-    string inputFileName = path + filename;
-    string outputFilename = binaryPath + "BIN_" + filename.substr(0, filename.find("."));
-    outputFilename += ".txt";
-
     ifstream inputFile(inputFileName);
     if (!inputFile.is_open())
     {
@@ -400,10 +392,10 @@ int main()
         return 1;
     }
 
-    ofstream outputFile(outputFilename);
+    ofstream outputFile(outputFileName);
     if(!outputFile.is_open())
     {
-        cerr << "Error creating output file. " << outputFilename << endl;
+        cerr << "Error creating output file. " << outputFileName << endl;
         return 1;
     }
 
@@ -413,10 +405,11 @@ int main()
 
     // Set $sp to the highest memory address available
     lines.insert(lines.begin(), "addi $sp, $zero, 159");
+    // For IO ports
     lines.insert(lines.begin(), "addi $io, $zero, 160");
 
     lines = renameRegisters(lines);
-    updateLabelMaps(lines);
+    updateLabelMaps(lines, debug);
 
     // for (string line : lines) cerr << line << endl;
 
@@ -426,7 +419,7 @@ int main()
         vector<string> tokens = tokenizer(line);
         if(tokens.size() > 0)
         {
-            string binary = getBinary(tokens, lineNumber);
+            string binary = getBinary(tokens, lineNumber, debug);
             if(!binary.empty() && binary != "\n" && binary != "")
             {
                 outputFile << binaryToHex(binary) << endl;
@@ -441,13 +434,43 @@ int main()
     cerr << endl;
     cerr << "Binary conversion completed." << endl;
     cout << "TOTAL BYTES: " << lineNumber << endl;
-    cerr << "Output file: " << outputFilename << endl;
+    cerr << "Output file: " << outputFileName << endl;
     
     // instruction memory is 8 bit wide, so only 256 instructions can be stored
     if(lineNumber > 256)
     {
         cerr << "!! Instruction memory overflow (" << lineNumber << "). Only 256 instructions are allowed." << endl;
+        return 1; 
     }
+
+    cerr << endl << endl;
+
+    return 0; // Success
+}
+
+int main()
+{
+    // take file name input (might have space)
+    string filename;
+    cout << "Enter the file name (In Aassembly\\ directory): ";
+    getline(cin, filename);
+
+    // if no extension given add .mips
+    if(filename.find(".") == string::npos)
+    {
+        filename += ".mips";
+    }
+
+    string basePath = "ASSEMBLY\\";
+    string outputBasePath = "BINARY\\";
+    
+    // string filename = "SNAKE_GAME.mips";
+
+    string inputFileName = basePath + filename;
+    string outputFilename = outputBasePath + "BIN_" + filename.substr(0, filename.find("."));
+    outputFilename += ".txt";
+
+    assembleFile(inputFileName, outputFilename, true);
 
     return 0;
 }
