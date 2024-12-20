@@ -5,6 +5,19 @@ This repository contains an 8-bit MIPS (Microprocessor without Interlocked Pipel
 
 ---
 
+## Demos
+
+### Snake Game Demo 
+![SnakeGame](https://media.giphy.com/media/VleEIiyLuSroiPZBTy/giphy.gif)
+
+### Hello World with counter
+![HelloWorld](https://i.giphy.com/media/v1.Y2lkPTc5MGI3NjExeDlzbnBrMmlzMjF5YXFheWo1MGN2NDR5OTNmdWxwaWt6NGgwYXMzNCZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9Zw/qPP3y7IH6vsYHA1Kxe/giphy.gif)
+
+### Random Matrix Display Demo 
+![RandomMatrix](https://media.giphy.com/media/NqDBS3IC6WY3EeLVCu/giphy.gif)
+
+---
+
 ## Features
 
 ### Instruction Set
@@ -76,19 +89,6 @@ The extended MIPS processor supports the following I/O peripherals:
 To output data of `$t0` to a peripheral at port 1 use `lw $t0, 1($io)`
 
 To get input in `$t0` from a peripheral at port 4 use `sw $t0, 4($io)`
-
----
-
-## Demos
-
-### Snake Game Demo 
-![SnakeGame](https://media.giphy.com/media/VleEIiyLuSroiPZBTy/giphy.gif)
-
-### Hello World with counter
-![HelloWorld](https://i.giphy.com/media/v1.Y2lkPTc5MGI3NjExeDlzbnBrMmlzMjF5YXFheWo1MGN2NDR5OTNmdWxwaWt6NGgwYXMzNCZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9Zw/qPP3y7IH6vsYHA1Kxe/giphy.gif)
-
-### Random Matrix Display Demo 
-![RandomMatrix](https://media.giphy.com/media/NqDBS3IC6WY3EeLVCu/giphy.gif)
 
 ---
 
