@@ -433,8 +433,8 @@ int main()
         filename += ".mips";
     }
 
-    string basePath = "ASSEMBLY\\";
-    string outputBasePath = "BINARY\\";
+    string basePath = "..\\ASSEMBLY\\";
+    string outputBasePath = "..\\BINARY\\";
     
     // string filename = "SNAKE_GAME.mips";
 
