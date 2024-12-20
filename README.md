@@ -113,6 +113,8 @@ To get input in `$t0` from a peripheral at port 4 use `sw $t0, 4($io)`
 
 ---
 
+
+
 ## How to Use
 
 ### Assembler
@@ -152,9 +154,15 @@ This repository includes a playable **Snake Game** written in MIPS assembly. To 
 
 1. Assemble `SNAKE_GAME.mips` using the assembler.
 2. Load the generated binary file into the **Instruction ROM**.
-4. Start simulation and set tick speed to 4.1 kHz. Enable tick and enjoy.
+3. Start simulation and set tick speed to 4.1 kHz. Enable tick and enjoy.
 
 ---
+
+### Major Limitations
+
+1. Only 8 bit instruction memory allows 256 lines of instruction so cannot write large complex programs.
+2. Lack of the 'jal' instruction makes life so much harder. Without jal cannot use any procedure calling as usage of jump forces to return to the same spot. Defeating the advantage of using a procedure.
+3. Slow simulation of logisim makes it boring (yes logisim's 4.1kHz is slow)
 
 ## License
 This project is licensed under the MIT License. See the `LICENSE` file for more details.
