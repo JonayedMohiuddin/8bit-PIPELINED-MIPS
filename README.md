@@ -85,13 +85,17 @@ To get input in `$t0` from a peripheral at port 4 use `sw $t0, 4($io)`
 
 
 1. **Compile using Assembler:**
+   
    To convert `.mips` assembly code to binary `.txt` files for Logisim first open the Assembler.cpp in your favourite code editos (like vscode or codeblocks). Then change the filename variable in code. 
    Run the assembler and it should generate a file in ./binary/ folder in the directory. 
 
-2. **Load the Binary in Logisim:**
+3. **Load the Binary in Logisim:**
+   
    Open logisim and load mips. In intruction or IF (if pipelined) and right click on the rom and click on Load Image and
-   then select the .txt binary file you just compiled. 
+   then select the .txt binary file you just compiled.
+   
    **Or**
+   
    Just run the Run_MIPS.bat batch file and select one of the four options shown (1/2/3/4). If logisim shows "The required library file 'ALUjar' is missing. Please select the file from the following dialog." 
    error just select the ALU.jar from base directory.
 ---
