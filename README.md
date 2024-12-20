@@ -79,6 +79,15 @@ To get input in `$t0` from a peripheral at port 4 use `sw $t0, 4($io)`
 
 ---
 
+## Demos
+
+### Hello World with counter
+
+![Hello World with counter animation](IMAGES\HELLO_WORLD_DEMO_MIPS.gif)
+
+
+---
+
 ## How to Use
 
 ### Assembler
