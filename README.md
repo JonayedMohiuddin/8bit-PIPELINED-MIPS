@@ -8,12 +8,21 @@ This repository contains an 8-bit MIPS (Microprocessor without Interlocked Pipel
 ## Demos
 
 ### Snake Game Demo 
+
+[Assembly of the game here](ASSEMBLY/SNAKE_GAME.mips)
+
 ![SnakeGame](https://media.giphy.com/media/VleEIiyLuSroiPZBTy/giphy.gif)
 
 ### Hello World with counter
+
+[Assembly of Hello World](ASSEMBLY/HELLO_WORLD.mips)
+
 ![HelloWorld](https://i.giphy.com/media/v1.Y2lkPTc5MGI3NjExeDlzbnBrMmlzMjF5YXFheWo1MGN2NDR5OTNmdWxwaWt6NGgwYXMzNCZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9Zw/qPP3y7IH6vsYHA1Kxe/giphy.gif)
 
 ### Random Matrix Display Demo 
+
+[Assembly of Random Matrix](ASSEMBLY/RANDOM_MATRIX.mips)
+
 ![RandomMatrix](https://media.giphy.com/media/NqDBS3IC6WY3EeLVCu/giphy.gif)
 
 ---
