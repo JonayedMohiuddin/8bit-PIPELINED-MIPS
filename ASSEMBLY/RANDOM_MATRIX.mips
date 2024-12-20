@@ -16,20 +16,20 @@
 # 15($io) => RAND INPUT
 # !! DISPLAY Caution: x is 5 bit and y is 4 bit 
 
-addi $t2, $zero 32
-addi $t0, $zero, 0 # initial x at 0
-draw:
+addi $t2, $zero 32 
+addi $t0, $zero, 0 # X value. Initial x at 0
 
 repeat:
-lw $t1, 15($io) # load random input for y value
-andi $t1, $t1, 15 # display y value is 4 bit
-sw $t0, 0($io) # store x value
-sw $t1, 1($io) # store y value
-sw $zero, 2($io) # update flag
-addi $t0, $t0, 1 # increment x by 1
-beq $t0, $t2, draw # if x = 32, go to draw
-j repeat # repeat
+    lw $t1, 15($io)    # load random input for y value
+    andi $t1, $t1, 15  # display y value is 4 bit
+    sw $t0, 0($io)     # store x value of pixel in display
+    sw $t1, 1($io)     # store y value of pixel in display
+    sw $zero, 2($io)   # save pixel x, y value in display
+    addi $t0, $t0, 1   # increment x by 1
+    beq $t0, $t2, draw # if x = 32, go to draw
+    j repeat           # repeat
+
 draw:
-sw $zero, 3($io) # flush flag
-addi $t0, $zero, 0 # reset x to 0
-j repeat 
+    sw $zero, 3($io) # flush flag, show all pixels.
+    addi $t0, $zero, 0 # reset x to 0
+    j repeat 
