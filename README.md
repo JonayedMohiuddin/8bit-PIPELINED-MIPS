@@ -91,7 +91,9 @@ To get input in `$t0` from a peripheral at port 4 use `sw $t0, 4($io)`
 2. **Load the Binary in Logisim:**
    Open logisim and load mips. In intruction or IF (if pipelined) and right click on the rom and click on Load Image and
    then select the .txt binary file you just compiled. 
-
+   **Or**
+   Just run the Run_MIPS.bat batch file and select one of the four options shown (1/2/3/4). If logisim shows "The required library file 'ALUjar' is missing. Please select the file from the following dialog." 
+   error just select the ALU.jar from base directory.
 ---
 
 ### Logisim Simulation
