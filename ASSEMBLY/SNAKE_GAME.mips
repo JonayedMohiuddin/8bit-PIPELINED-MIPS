@@ -252,7 +252,11 @@ draw_snake_loop:
     j draw_snake_loop 
 
 introduction_message:
-    # PRINT "Snake Game." on text screen decimal ascii
+    # pre-save SPACE and other most used char in $t1 for later use
+    addi $t1, $zero, 32 # SPACE
+    addi $t2, $zero, 10 # NEW LINE
+
+    # PRINT "Snake Game" on text screen decimal ascii
     addi $t0, $zero, 83 # S
     sw $t0, 5($io)
     addi $t0, $zero, 110 # n
@@ -263,8 +267,9 @@ introduction_message:
     sw $t0, 5($io)
     addi $t0, $zero, 101 # e
     sw $t0, 5($io)
-    addi $t0, $zero, 32 # SPACE
-    sw $t0, 5($io)
+
+    sw $t1, 5($io) # SPACE
+
     addi $t0, $zero, 71 # G
     sw $t0, 5($io)
     addi $t0, $zero, 97 # a
@@ -273,22 +278,20 @@ introduction_message:
     sw $t0, 5($io)
     addi $t0, $zero, 101 # e
     sw $t0, 5($io)
-    addi $t0, $zero, 46 # .
-    sw $t0, 5($io)
-    addi $t0, $zero, 10 # NEW LINE
-    sw $t0, 5($io)
 
-    # print "Use 'Poke Tool' on keyboard to play." on text screen
+    sw $t2, 5($io) # NEW LINE
+
+            
+    # print "Use Poke tool on keyboard to play (use WASD)" on text screen
     addi $t0, $zero, 85 # U
     sw $t0, 5($io)
     addi $t0, $zero, 115 # s
     sw $t0, 5($io)
     addi $t0, $zero, 101 # e
     sw $t0, 5($io)
-    addi $t0, $zero, 32 # SPACE
-    sw $t0, 5($io)
-    addi $t0, $zero, 39 # '
-    sw $t0, 5($io)
+
+    sw $t1, 5($io) # SPACE
+
     addi $t0, $zero, 80 # P
     sw $t0, 5($io)
     addi $t0, $zero, 111 # o
@@ -297,8 +300,9 @@ introduction_message:
     sw $t0, 5($io)
     addi $t0, $zero, 101 # e
     sw $t0, 5($io)
-    addi $t0, $zero, 32 # SPACE
-    sw $t0, 5($io)
+    
+    sw $t1, 5($io) # SPACE
+
     addi $t0, $zero, 84 # T
     sw $t0, 5($io)
     addi $t0, $zero, 111 # o
@@ -307,16 +311,16 @@ introduction_message:
     sw $t0, 5($io)
     addi $t0, $zero, 108 # l
     sw $t0, 5($io)
-    addi $t0, $zero, 39 # '
-    sw $t0, 5($io)
-    addi $t0, $zero, 32 # SPACE
-    sw $t0, 5($io)
+
+    sw $t1, 5($io) # SPACE
+
     addi $t0, $zero, 111 # o
     sw $t0, 5($io)
     addi $t0, $zero, 110 # n
     sw $t0, 5($io)
-    addi $t0, $zero, 32 # SPACE
-    sw $t0, 5($io)
+
+    sw $t1, 5($io) # SPACE
+
     addi $t0, $zero, 107 # k
     sw $t0, 5($io)
     addi $t0, $zero, 101 # e
@@ -333,14 +337,16 @@ introduction_message:
     sw $t0, 5($io)
     addi $t0, $zero, 100 # d
     sw $t0, 5($io)
-    addi $t0, $zero, 32 # SPACE
-    sw $t0, 5($io)
+
+    sw $t2, 5($io) # NEW LINE
+
     addi $t0, $zero, 116 # t
     sw $t0, 5($io)
     addi $t0, $zero, 111 # o
     sw $t0, 5($io)
-    addi $t0, $zero, 10 # NEW LINE
-    sw $t0, 5($io)
+
+    sw $t1, 5($io) # SPACE
+
     addi $t0, $zero, 112 # p
     sw $t0, 5($io)
     addi $t0, $zero, 108 # l
@@ -349,10 +355,33 @@ introduction_message:
     sw $t0, 5($io)
     addi $t0, $zero, 121 # y
     sw $t0, 5($io)
-    addi $t0, $zero, 46 # .
+
+    sw $t1, 5($io) # SPACE
+
+    addi $t0, $zero, 40 # (
     sw $t0, 5($io)
-    addi $t0, $zero, 10 # NEW LINE
+    addi $t0, $zero, 117 # u
     sw $t0, 5($io)
+    addi $t0, $zero, 115 # s
+    sw $t0, 5($io)
+    addi $t0, $zero, 101 # e
+    sw $t0, 5($io)
+
+    sw $t1, 5($io) # SPACE
+
+    addi $t0, $zero, 87 # W
+    sw $t0, 5($io)
+    addi $t0, $zero, 65 # A
+    sw $t0, 5($io)
+    addi $t0, $zero, 83 # S
+    sw $t0, 5($io)
+    addi $t0, $zero, 68 # D
+    sw $t0, 5($io)
+    addi $t0, $zero, 41 # )
+    sw $t0, 5($io)
+
+    sw $t2, 5($io) # NEW LINE
+
     j after_introduction_message
 
 death_message:
@@ -373,8 +402,6 @@ death_message:
     sw $t0, 5($io)
     addi $t0, $zero, 116 # t
     sw $t0, 5($io)
-    addi $t0, $zero, 46 # .
-    sw $t0, 5($io)
     addi $t0, $zero, 10 # NEW LINE
     sw $t0, 5($io)
     j after_death_message
@@ -394,8 +421,6 @@ win_message:
     addi $t0, $zero, 111 # o
     sw $t0, 5($io)
     addi $t0, $zero, 110 # n
-    sw $t0, 5($io)
-    addi $t0, $zero, 46 # .
     sw $t0, 5($io)
     addi $t0, $zero, 10 # NEW LINE
     sw $t0, 5($io)

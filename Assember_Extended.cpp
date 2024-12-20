@@ -387,7 +387,7 @@ int main()
     string path = "ASSEMBLY\\";
     string binaryPath = "BINARY\\";
     
-    string filename = "HELLO_WORLD.mips";
+    string filename = "SNAKE_GAME.mips";
 
     string inputFileName = path + filename;
     string outputFilename = binaryPath + "BIN_" + filename.substr(0, filename.find("."));
@@ -446,7 +446,7 @@ int main()
     // instruction memory is 8 bit wide, so only 256 instructions can be stored
     if(lineNumber > 256)
     {
-        cerr << "!! Instruction memory overflow. Only 256 instructions are allowed." << endl;
+        cerr << "!! Instruction memory overflow (" << lineNumber << "). Only 256 instructions are allowed." << endl;
     }
 
     return 0;
