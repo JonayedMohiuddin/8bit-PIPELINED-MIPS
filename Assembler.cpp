@@ -16,7 +16,8 @@ unordered_map<string, string> opcodeMap = {
 unordered_map<string, string> registerMap = {
     {"$zero", "0000"}, {"$t1", "0001"}, {"$t2", "0010"}, 
     {"$t3", "0011"}, {"$t4", "0100"}, {"$t0", "0101"}, 
-    {"$sp", "0110"}};
+    {"$sp", "0110"}
+};
 
 
 // Map for labels

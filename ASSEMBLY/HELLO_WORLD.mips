@@ -1,0 +1,63 @@
+# CLASSICAL SNAKE GAME
+# MADE BY : JONAYED MOHIUDDIN 
+# EMAIL   : jonayedmohiuddin@gmail.com
+# Intended to run by the 8-bit mips here : https://github.com/JonayedMohiuddin/8bit_MIPS
+
+# IO PORTS:
+# 0($io) => X ENABLE + DATA
+# 1($io) => Y ENABLE + DATA
+# 2($io) => UPDATE FLAG
+# 3($io) => FLUSH FLAG
+# 4($io) => KEYBOARD INPUT
+# 5($io) => TEXT OUTPUT (TTY)
+# ...    => UNUSED
+# 13($io) => SIGNED DECIMAL OUTPUT DISPLAY (7 SEGMENT DISPLAY)
+# 14($io) => DEBUG OUTPUT 
+# 15($io) => RAND INPUT
+
+# NON STANDARD MIPS INSTRUCTIONS:
+# RENAMING REGISTERS FOR EASE OF USE
+# USE @ TO RENAME REGISTERS [@ old_name new_name]
+@ t0 counter
+@ t1 ascii
+
+main:
+    addi $counter, $zero, 0 # initialize counter to 0
+    j loop 
+
+# print "Hello World!" + Counter on loop
+loop:
+    # Print "Hello World!" on TTY (Text Output)
+    addi $ascii, $zero, 72 # H
+    sw $ascii, 5($io)
+    addi $ascii, $zero, 101 # e
+    sw $ascii, 5($io)
+    addi $ascii, $zero, 108 # l
+    sw $ascii, 5($io)
+    sw $ascii, 5($io)
+    addi $ascii, $zero, 111 # o
+    sw $ascii, 5($io)
+    addi $ascii, $zero, 32 # space
+    sw $ascii, 5($io)
+    addi $ascii, $zero, 87 # W
+    sw $ascii, 5($io)
+    addi $ascii, $zero, 111 # o
+    sw $ascii, 5($io)
+    addi $ascii, $zero, 114 # r
+    sw $ascii, 5($io)
+    addi $ascii, $zero, 108 # l
+    sw $ascii, 5($io)
+    addi $ascii, $zero, 100 # d
+    sw $ascii, 5($io)
+    addi $ascii, $zero, 33 # !
+    sw $ascii, 5($io)
+    addi $ascii, $zero, 10 # \n
+    sw $ascii, 5($io)
+
+    # print counter to 7-segment display
+    addi $counter, $counter, 1 # increment counter
+    sw $counter, 13($io) # display counter
+
+    j loop # loop back
+    
+exit:

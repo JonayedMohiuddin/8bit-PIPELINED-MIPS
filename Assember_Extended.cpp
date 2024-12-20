@@ -387,7 +387,7 @@ int main()
     string path = "ASSEMBLY\\";
     string binaryPath = "BINARY\\";
     
-    string filename = "RANDOM_MATRIX.mips";
+    string filename = "HELLO_WORLD.mips";
 
     string inputFileName = path + filename;
     string outputFilename = binaryPath + "BIN_" + filename.substr(0, filename.find("."));
