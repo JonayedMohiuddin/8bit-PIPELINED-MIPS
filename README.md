@@ -11,19 +11,31 @@ This repository contains an 8-bit MIPS (Microprocessor without Interlocked Pipel
 
 [Assembly code of the game](ASSEMBLY/SNAKE_GAME.mips)
 
+<img src="https://github.com/JonayedMohiuddin/8bit-PIPELINED-MIPS/blob/main/IMAGES/SNAKE_GAME_DEMO_MIPS.gif" width="500" height="auto">
+
+<!-- USE IF GITHUB STOPS SHOWING GIF FROM REPO
 ![SnakeGame](https://media.giphy.com/media/VleEIiyLuSroiPZBTy/giphy.gif)
+-->
 
 ### Hello World with counter
 
 [Assembly of Hello World](ASSEMBLY/HELLO_WORLD.mips)
 
+<img src="https://github.com/JonayedMohiuddin/8bit-PIPELINED-MIPS/blob/main/IMAGES/HELLO_WORLD_DEMO_MIPS.gif" width="500" height="auto">
+
+<!-- USE IF GITHUB STOPS SHOWING GIF FROM REPO
 ![HelloWorld](https://i.giphy.com/media/v1.Y2lkPTc5MGI3NjExeDlzbnBrMmlzMjF5YXFheWo1MGN2NDR5OTNmdWxwaWt6NGgwYXMzNCZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9Zw/qPP3y7IH6vsYHA1Kxe/giphy.gif)
+-->
 
 ### Random Matrix Display Demo 
 
 [Assembly of Random Matrix](ASSEMBLY/RANDOM_MATRIX.mips)
 
+<img src="https://github.com/JonayedMohiuddin/8bit-PIPELINED-MIPS/blob/main/IMAGES/RANDOM_MATRIX_DISPLAY_DEMO_MIPS.gif" width="500" height="auto">
+
+<!-- USE IF GITHUB STOPS SHOWING GIF FROM REPO
 ![RandomMatrix](https://media.giphy.com/media/NqDBS3IC6WY3EeLVCu/giphy.gif)
+-->
 
 ---
 
