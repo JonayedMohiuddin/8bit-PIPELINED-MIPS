@@ -9,7 +9,7 @@ This repository contains an 8-bit MIPS (Microprocessor without Interlocked Pipel
 
 ### Snake Game Demo 
 
-[Assembly of the game here](ASSEMBLY/SNAKE_GAME.mips)
+[Assembly code of the game](ASSEMBLY/SNAKE_GAME.mips)
 
 ![SnakeGame](https://media.giphy.com/media/VleEIiyLuSroiPZBTy/giphy.gif)
 
