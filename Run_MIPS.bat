@@ -35,4 +35,4 @@ if not exist "logisim-generic-2.7.1.jar" (
 )
 
 :: Run Logisim with the selected .circ file
-java -jar logisim-generic-2.7.1.jar "%circuit%" -sub ALU.jar ALU.jar
+java -jar logisim-generic-2.7.1.jar "%circuit%"
