@@ -1,0 +1,167 @@
+# CLASSICAL TETRIS GAME
+# MADE BY : JONAYED MOHIUDDIN 
+# EMAIL   : jonayedmohiuddin@gmail.com
+# Intended to run by the 8-bit mips here : https://github.com/JonayedMohiuddin/8bit_MIPS
+
+# CONTROLS : d/D = RIGHT, s/S = DOWN, a/A = LEFT
+# DISPLAY : 16 x 32 LED matrix, 3 x 7 digit display and TTY text screen 
+# !! DISPLAY Caution: x is 5 bit and y is 4 bit 
+
+# IO PORTS:
+# 0($io) => X ENABLE + DATA
+# 1($io) => Y ENABLE + DATA
+# 2($io) => UPDATE FLAG
+# 3($io) => FLUSH FLAG
+# 4($io) => KEYBOARD INPUT
+# 5($io) => TEXT OUTPUT (TTY)
+# ...    => UNUSED
+# 13($io) => SIGNED DECIMAL OUTPUT DISPLAY (7 SEGMENT DISPLAY)
+# 14($io) => DEBUG OUTPUT 
+# 15($io) => RAND INPUT
+
+# Control Mapping:
+# 011 = w/W = UP = 3
+# 100 = d/D = RIGHT = 4
+# 111 = s/S = DOWN = 7
+# 001 = a/A = LEFT = 1
+
+# MEMORY MAPPING:
+# 000 - 127 : GAME DATA [SCREEN SIMULATION]
+# 128 - 159 : OTHER DATA + STACK
+# 160 - 175 : IO PORTS
+# 192 - 207 : OTHER DATA
+# 208 - 255 : GAME DATA [BASE SHAPE SPAWN DATA]
+
+#                                SHAPES
+#
+#   |+||+|   |+|               |+|         |+||+|     |+||+|         |+|
+#   |+||+|   |+||+||+|   |+||+||+|      |+||+|           |+||+|   |+||+||+|
+#     0 (O)      1 (L)       2 (J)          3 (S)         4 (Z)       5 (T)
+#    SHAPE INDEX BASE MEMORY AT $shape
+
+
+# REGISTERS:
+# $zero, $sp, $io, $t0, $t1, $t2, $t3, $t4, $v0, $v1, $v2, $v3, $s0, $s1, $s2, $s3
+
+# NON STANDARD MIPS INSTRUCTIONS:
+# RENAMING REGISTERS FOR EASE OF USE
+# USE @ TO RENAME REGISTERS [@ old_name new_name]
+@ s3 shape     # shape memory space base index
+@ s2 score 
+@ s1 sim       # simulation memory space base index
+@ s0 shapeX    # the x cord of moving shape [-1 if the shape is static]
+@ v3 shapeY    # the y cord of moving shape [-1 if the shape is static]
+
+main:
+    j init
+    after_init:
+    j game_loop
+
+init:
+    addi $score, $zero, 0   # reset score
+
+    # LOAD SHAPE DATA INTO MEMORY
+    addi $shape, $zero, 208 # shape memory space base index set
+
+    addi $t0, $zero, 3   # x = 3
+    addi $t1, $zero, 4   # x = 4
+    addi $t2, $zero, 5   # x = 5
+    addi $v0, $zero, 15  # y = 15
+    addi $v1, $zero, 14  # y = 14
+
+    # LOAD SHAPE 0 (O) 
+    # (3, 15), (4, 15), (3, 14), (4, 14)
+    sw $t0, 0($shape)
+    sw $v0, 1($shape) # (3, 15)
+    sw $t1, 2($shape)
+    sw $v0, 3($shape) # (4, 15)
+    sw $t0, 4($shape)
+    sw $v1, 5($shape) # (3, 14)
+    sw $t1, 6($shape)
+    sw $v1, 7($shape) # (4, 14)
+
+    # LOAD SHAPE 1 (L)
+    # (3, 15), (3, 14), (4, 14), (5, 14)
+    sw $t0, 8($shape)
+    sw $v0, 9($shape) # (3, 15)
+    sw $t0, 10($shape)
+    sw $v1, 11($shape) # (3, 14)
+    sw $t1, 12($shape)
+    sw $v1, 13($shape) # (4, 14)
+    sw $t2, 14($shape)
+    sw $v1, 15($shape) # (5, 14)
+
+    # LOAD SHAPE 2 (J)
+    # (5, 15), (3, 14), (4, 14), (5, 14)
+    sw $t2, 16($shape)
+    sw $v0, 17($shape) # (5, 15)
+    sw $t0, 18($shape)
+    sw $v1, 19($shape) # (3, 14)
+    sw $t1, 20($shape)
+    sw $v1, 21($shape) # (4, 14)
+    sw $t2, 22($shape)
+    sw $v1, 23($shape) # (5, 14)
+
+    # LOAD SHAPE 3 (S)
+    # (4, 15), (5, 15), (3, 14), (4, 14)
+    sw $t1, 24($shape)
+    sw $v0, 25($shape) # (4, 15)
+    sw $t2, 26($shape)
+    sw $v0, 27($shape) # (5, 15)
+    sw $t0, 28($shape)
+    sw $v1, 29($shape) # (3, 14)
+    sw $t1, 30($shape)
+    sw $v1, 31($shape) # (4, 14)
+
+    # LOAD SHAPE 4 (Z)
+    # (3, 15), (4, 15), (4, 14), (5, 14)
+    sw $t0, 32($shape)
+    sw $v0, 33($shape) # (3, 15)
+    sw $t1, 34($shape)
+    sw $v0, 35($shape) # (4, 15)
+    sw $t1, 36($shape)
+    sw $v1, 37($shape) # (4, 14)
+    sw $t2, 38($shape)
+    sw $v1, 39($shape) # (5, 14)
+    
+    # LOAD SHAPE 5 (T)
+    # (4, 15), (3, 14), (4, 14), (5, 14)
+    sw $t1, 40($shape)
+    sw $v0, 41($shape) # (4, 15)
+    sw $t0, 42($shape)
+    sw $v1, 43($shape) # (3, 14)
+    sw $t1, 44($shape)
+    sw $v1, 45($shape) # (4, 14)
+    sw $t2, 46($shape)
+    sw $v1, 47($shape) # (5, 14)
+
+    # EACH SHAPE TAKES 8 MEMORY SPACES
+    # TO ACCESS THE N-TH SHAPE, USE $shape + 8 * N
+
+    j after_init
+
+game_loop:    
+    ### A RIGHT WALL TO SHOW SCREEN END AT (8, ...) CORD
+    addi $t0, $zero, 8 # x = 8
+    addi $t1, $zero, 0 # y = 0
+    addi $t2, $zero, 15 # y = 15 max y limit
+    j draw_screen_border_loop
+    after_draw_screen_border_loop:
+
+
+    ### SHOW ALL UPDATED PIXELS ON SCREEN
+    sw $zero, 3($io) # flush display
+
+    j game_loop
+
+
+
+draw_screen_border_loop:
+    sw $t0, 0($io)    # send x to display
+    sw $t1, 1($io)    # send y to display
+    sw $zero, 2($io)  # update display
+    beq $t1, $t2, after_draw_screen_border_loop
+    addi $t1, $t1, 1
+    j draw_screen_border_loop
+
+exit:
