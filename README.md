@@ -113,6 +113,8 @@ To get input in `$t0` from a peripheral at port 4 use `sw $t0, 4($io)`
 
 ---
 
+
+
 ## How to Use
 
 ### Assembler
@@ -130,20 +132,8 @@ To get input in `$t0` from a peripheral at port 4 use `sw $t0, 4($io)`
    
    **Or**
    
-   Just run the Run_MIPS.bat batch file and select one of the four options shown (1/2/3/4). If logisim shows "The required library file 'ALUjar' is missing. Please select the file from the following dialog." 
+   Just run the Run_MIPS.bat batch file and select one of the four options shown (1/2/3/4). If logisim shows "The required library file 'ALU.jar' is missing. Please select the file from the following dialog." 
    error just select the ALU.jar from base directory.
----
-
-### Logisim Simulation
-1. **Open the Circuit File:**
-   - For normal MIPS: Use `MIPS_Pipelined.circ` or `MIPS_NonPipelined.circ`.
-   - For extended MIPS: Use `MIPS_Pipelined_Extended.circ` or `MIPS_NonPipelined_Extended.circ`.
-
-2. **Load the Binary:**
-   Load the assembled binary file into the **Instruction ROM**.
-
-3. **Run the Simulation:**
-   Use Logisim's controls to step through or run the simulation.
 
 ---
 
@@ -152,9 +142,15 @@ This repository includes a playable **Snake Game** written in MIPS assembly. To 
 
 1. Assemble `SNAKE_GAME.mips` using the assembler.
 2. Load the generated binary file into the **Instruction ROM**.
-4. Start simulation and set tick speed to 4.1 kHz. Enable tick and enjoy.
+3. Start simulation and set tick speed to 4.1 kHz. Enable tick and enjoy.
 
 ---
+
+### Major Limitations
+
+1. Only 8 bit instruction memory allows 256 lines of instruction so cannot write large complex programs.
+2. Lack of the 'jal' instruction makes life so much harder. Without jal cannot use any procedure calling as usage of jump forces to return to the same spot. Defeating the advantage of using a procedure.
+3. Slow simulation of logisim makes it boring (yes logisim's 4.1kHz is slow)
 
 ## License
 This project is licensed under the MIT License. See the `LICENSE` file for more details.
