@@ -117,7 +117,7 @@ game_loop:
     sw $zero, 3($io)
 
     # get keyboard input
-    addi $t2, $zero, 0
+    # addi $t2, $zero, 0
     lw $t2, 4($io)
     andi $t2, $t2, 7 # keep lsb 3 bits, 111 UP, 100 RIGHT, 011 DOWN, 001 LEFT
 
