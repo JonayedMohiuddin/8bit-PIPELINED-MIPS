@@ -58,17 +58,8 @@ main:
     addi $shape, $zero, -1  # reset shape location
     sw $score, 13($io)      # send score to display
 
-    addi $t0, $zero, 1
-    sw $t0, 35($zero)       # (2, 3) at memory = 2 * 16 + 3 = 35
-
     j game_loop
 
-#########################################################################
-#####################         TODO        ###############################
-#########################################################################
-# 1. Keep single procedure for left/right just pass +16 or -16          #
-# 2. Make use of the memory to screen loop for bottom row clearance     #
-#########################################################################
 
 game_loop:    
     ### RIGHT BORDER AT (8, ...) CORD
@@ -434,15 +425,26 @@ spawn_shape:
     # number to shape mapping:
     # 0 = O, 1 = L, 2 = J, 3 = 7, 4 = I, 5 = O, 6 = L, 7 = J
     lw $t0, 15($io)     # get random number
-    andi $t0, $t0, 3    # get last 3 bits
+    andi $t0, $t0, 7    # get last 3 bits
 
-    # addi $t2, $zero, 0
-    # beq $t0, $t2, spawn_shape_o
-    # addi $t2, $zero, 1
-    # beq $t0, $t2, spawn_shape_l
-    # addi $t2, $zero, 2
-    # beq $t0, $t2, spawn_shape_j
-    # j spawn_shape_o
+    addi $t2, $zero, 0
+    beq $t0, $t2, spawn_shape_o
+    addi $t2, $zero, 1
+    beq $t0, $t2, spawn_shape_l
+    addi $t2, $zero, 2
+    beq $t0, $t2, spawn_shape_j
+    addi $t2, $zero, 3
+    beq $t0, $t2, spawn_shape_7
+    addi $t2, $zero, 4
+    beq $t0, $t2, spawn_shape_i
+    addi $t2, $zero, 5
+    beq $t0, $t2, spawn_shape_o
+    addi $t2, $zero, 6
+    beq $t0, $t2, spawn_shape_l
+    addi $t2, $zero, 7
+    beq $t0, $t2, spawn_shape_j
+    
+    j spawn_shape_o
 
     ### TEMP
     j spawn_shape_i
@@ -497,14 +499,14 @@ spawn_shape_j:
     sw $t1, 0($t0)      # set the shape at (4, 15)
     j after_spawn_shape_specific
 
-# spawn_shape_7:
-#     addi $t0, $zero, 63 # (3, 15) at memory = 3 * 16 + 15 = 63   # C
-#     sw $t1, 0($t0)      # set the shape at (3, 15)
-#     addi $t0, $zero, 78 # (4, 14) at memory = 4 * 16 + 14 = 78   # B
-#     sw $t1, 0($t0)      # set the shape at (4, 14)
-#     addi $t0, $zero, 79 # (4, 15) at memory = 4 * 16 + 15 = 79   # D
-#     sw $t1, 0($t0)      # set the shape at (4, 15)
-#     j after_spawn_shape_specific
+spawn_shape_7:
+    addi $t0, $zero, 63 # (3, 15) at memory = 3 * 16 + 15 = 63   # C
+    sw $t1, 0($t0)      # set the shape at (3, 15)
+    addi $t0, $zero, 78 # (4, 14) at memory = 4 * 16 + 14 = 78   # B
+    sw $t1, 0($t0)      # set the shape at (4, 14)
+    addi $t0, $zero, 79 # (4, 15) at memory = 4 * 16 + 15 = 79   # D
+    sw $t1, 0($t0)      # set the shape at (4, 15)
+    j after_spawn_shape_specific
 
 spawn_shape_i:
     addi $t0, $zero, 62 # (3, 14) at memory = 3 * 16 + 14 = 62   # A
