@@ -17,7 +17,7 @@ This repository contains an 8-bit MIPS (Microprocessor without Interlocked Pipel
 ![SnakeGame](https://media.giphy.com/media/VleEIiyLuSroiPZBTy/giphy.gif)
 -->
 
-### Classical Tetris Game
+### Classical Tetris Game (Sped Up)
 
 [Assembly code of the game](ASSEMBLY/TETRIS_GAME.mips)
 
