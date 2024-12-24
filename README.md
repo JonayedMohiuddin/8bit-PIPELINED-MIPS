@@ -5,9 +5,9 @@ This repository contains an 8-bit MIPS (Microprocessor without Interlocked Pipel
 
 ---
 
-## Demos
+## Demos 
 
-### Snake Game Demo 
+### Classical Snake Game 
 
 [Assembly code of the game](ASSEMBLY/SNAKE_GAME.mips)
 
@@ -17,7 +17,13 @@ This repository contains an 8-bit MIPS (Microprocessor without Interlocked Pipel
 ![SnakeGame](https://media.giphy.com/media/VleEIiyLuSroiPZBTy/giphy.gif)
 -->
 
-### Hello World with counter
+### Classical Tetris Game
+
+[Assembly code of the game](ASSEMBLY/TETRIS_GAME.mips)
+
+***Will add animation soon***
+
+### Hello World with Counter
 
 [Assembly of Hello World](ASSEMBLY/HELLO_WORLD.mips)
 
