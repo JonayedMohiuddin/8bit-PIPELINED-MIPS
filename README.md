@@ -1,13 +1,13 @@
 
 # 8-bit Pipelined MIPS Processor
 
-This repository contains an 8-bit MIPS (Microprocessor without Interlocked Pipelined Stages) processor designed in **Logisim**, supporting both pipelined and non-pipelined architectures. The project includes a custom assembler to convert MIPS assembly code into binary files for MIPS instruction ROM. An extended version of the processor features I/O peripheral support, along with a playable **Snake Game** implemented in MIPS assembly.
+This repository contains an 8-bit MIPS (Microprocessor without Interlocked Pipelined Stages) processor designed in **Logisim**, supporting both pipelined and non-pipelined architectures. The project includes a custom assembler to convert MIPS assembly code into binary files for MIPS instruction ROM. An extended version of the processor features I/O peripheral support. Also some classical game is implemented in it like: Snake, Tetris.
 
 ---
 
-## Demos
+## Demos 
 
-### Snake Game Demo 
+### Classical Snake Game 
 
 [Assembly code of the game](ASSEMBLY/SNAKE_GAME.mips)
 
@@ -17,7 +17,13 @@ This repository contains an 8-bit MIPS (Microprocessor without Interlocked Pipel
 ![SnakeGame](https://media.giphy.com/media/VleEIiyLuSroiPZBTy/giphy.gif)
 -->
 
-### Hello World with counter
+### Classical Tetris Game
+
+[Assembly code of the game](ASSEMBLY/TETRIS_GAME.mips)
+
+***Will add animation soon***
+
+### Hello World with Counter
 
 [Assembly of Hello World](ASSEMBLY/HELLO_WORLD.mips)
 
