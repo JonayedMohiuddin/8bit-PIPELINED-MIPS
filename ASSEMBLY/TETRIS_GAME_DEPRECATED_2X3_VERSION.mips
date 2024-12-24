@@ -354,3 +354,530 @@ draw_screen_border_loop:
     j draw_screen_border_loop
 
 exit:
+
+
+
+
+### DEPRECATED CODE VERSION: GAME PLAY IS NOT CENTERED ON SCREEN 
+### GAME IS SIMULATED IN LEFT SIDE OF SCREEN 
+# CLASSICAL TETRIS GAME
+# MADE BY : JONAYED MOHIUDDIN 
+# EMAIL   : jonayedmohiuddin@gmail.com
+# Intended to run by the 8-bit mips here : https://github.com/JonayedMohiuddin/8bit_MIPS
+
+# CONTROLS : d/D = RIGHT, s/S = DOWN, a/A = LEFT
+# DISPLAY : 16 x 32 LED matrix, 3 x 7 digit display and TTY text screen 
+# !! DISPLAY Caution: x is 5 bit and y is 4 bit 
+
+# IO PORTS:
+# 0($io) => X ENABLE + DATA
+# 1($io) => Y ENABLE + DATA
+# 2($io) => UPDATE FLAG
+# 3($io) => FLUSH FLAG
+# 4($io) => KEYBOARD INPUT
+# 5($io) => TEXT OUTPUT (TTY)
+# ...    => UNUSED
+# 13($io) => SIGNED DECIMAL OUTPUT DISPLAY (7 SEGMENT DISPLAY)
+# 14($io) => DEBUG OUTPUT 
+# 15($io) => RAND INPUT
+
+# Control Mapping:
+# 011 = w/W = UP = 3
+# 100 = d/D = RIGHT = 4
+# 111 = s/S = DOWN = 7
+# 001 = a/A = LEFT = 1
+
+# MEMORY MAPPING:
+# 000 - 127 : GAME DATA [SIMULATION]
+# 128 - 239 : DATA + STACK
+# 240 - 255 : IO PORTS
+
+# SCREEN SIMULATION ARRAY STRUCTURE:
+# 0 - 127 : 16 x 8 SCREEN SIMULATION (DROPS RIGHT TO LEFT)
+# 0 = EMPTY, 1 = STATIC, 2 = MOVING
+# Moving Down : -1 , Moving Left : -16 , Moving Right : +16
+
+#                 SHAPES
+#
+#   |+||+|   |+|         |+|   |+|
+#   |+||+|   |+||+|   |+||+|   |+|
+#     O        L         J      I
+
+# REGISTERS:
+# $zero, $sp, $io, $t0, $t1, $t2, $t3, $t4, $v0, $v1, $v2, $v3, $s0, $s1, $s2, $s3
+
+# NON STANDARD MIPS INSTRUCTIONS:
+# RENAMING REGISTERS FOR EASE OF USE
+# USE @ TO RENAME REGISTERS [@ old_name new_name]
+@ s3 shape     # shape memory space base index
+@ s2 score 
+@ s1 sim       # simulation memory space base index
+@ s0 shape     # memory location of the shape (bottom left corner)
+
+main:
+    # INITIALIZATION
+    addi $score, $zero, 0   # reset score
+    addi $shape, $zero, -1  # reset shape location
+    sw $score, 13($io)      # send score to display
+
+    j game_loop
+
+
+game_loop:    
+    ### RIGHT BORDER AT (8, ...) CORD
+    addi $t0, $zero, 8 # x = 8
+    addi $t1, $zero, 0 # y = 0
+    addi $t2, $zero, 15 # y = 15 max y limit
+    j draw_screen_border_loop
+    after_draw_screen_border_loop:
+
+    ### SPAWN A SHAPE
+    addi $t0, $zero, -1
+    beq $shape, $t0, spawn_shape  # if previous shape became static, spawn a new shape [shape is static if $shape = -1]
+    after_spawn_shape:
+
+    ### MAP MEMORY SPACE TO SCREEN SPACE AND DRAW
+    ### ALSO CHECK IF ANY ROW IS FULL
+    addi $t0, $zero, 0  # x memory indexing (inner loop)
+    addi $v1, $zero, 0  # X : actual x value (inner loop)
+    addi $t1, $zero, 0  # y , Y : memory indexing = actual value (outer loop)
+    addi $t2, $zero, 8  # max inner loop index
+    addi $t3, $zero, 16 # max outer loop index 
+    addi $v2, $zero, 1  # Assume row is full
+    addi $v3, $zero, -1 # memory index of the full row , -1 if no full row
+    j draw_screen_simulation_outer_loop
+    after_draw_screen_simulation_outer_loop:
+
+
+    ### IF ROW IS FULL, CLEAR THE ROW. AND DROP ALL ROWS ABOVE
+    addi $t0, $zero, -1
+    bneq $v3, $t0, clear_row_and_drop
+    after_clear_row_and_drop:
+
+
+    ### FLUSH DISPLAY
+    sw $zero, 3($io)  # flush display
+
+    ### MOVE SHAPE 
+    # { PARAM : $v2 = Direction/Offset, 
+    #           $v3 = Border Check Mask, 
+    #           $t4 = Border Check Leftover Value Check }
+
+    # TAKE KEYBOARD INPUT
+    addi $t0, $zero, 1          # LEFT
+    addi $t1, $zero, 4          # RIGHT
+    lw $t2, 4($io)              # get keyboard input
+    andi $t2, $t2, 7            # get last 3 bits
+    beq $t2, $t0, move_left
+    beq $t2, $t1, move_right
+    j dont_move_left_right
+
+    # MOVE RIGHT
+    move_right:
+    addi $v2, $zero, 16
+    addi $v3, $zero, 240
+    addi $t4, $zero, 112
+    j move_shape_if_valid
+
+    # MOVE LEFT
+    move_left:
+    addi $v2, $zero, -16
+    addi $v3, $zero, 240
+    addi $t4, $zero, 0
+    j move_shape_if_valid
+
+    after_move_shape_if_valid_left_right:
+    dont_move_left_right:
+    
+    # MOVE DOWN
+    addi $v2, $zero, -1
+    addi $v3, $zero, 15
+    addi $t4, $zero, 0
+    j move_shape_if_valid
+    after_shape_move_shape_if_valid_down:
+
+    j game_loop
+
+
+clear_row_and_drop:
+    addi $t0, $zero, 0  # x memory indexing (inner loop) 
+    addi $v1, $zero, 0  # X : actual x value (inner loop)
+    addi $t1, $v3,   1  # ! y , Y : memory indexing = actual value (outer loop)
+                        # Starts from the full row + 1
+    addi $t2, $zero,128 # max inner loop memory space index
+    addi $t3, $zero, 16 # max outer loop index
+    addi $v2, $zero, 2  # value of moving state is 2, we need to ignore them  
+    j drop_all_rows_above_outer_loop
+    after_drop_all_rows_above_outer_loop:   
+
+    addi $shape, $shape, -1  # also move shape anchor position down
+    addi $v3, $zero, -1      # reset full row index  
+
+    addi $score, $score, 1      # increment score
+    sw $score, 13($io)          # send score to display
+
+    j after_clear_row_and_drop
+
+drop_all_rows_above_outer_loop:
+    drop_all_rows_above_inner_loop:
+        add $t4, $t0, $t1                               # memory index : (x + y) in memory space
+        lw $v0,   0($t4)                                # memory value
+        sw $v0,  -1($t4)                                # move the value to the row below
+        sw $zero, 0($t4)                                # make the current row empty
+
+        add $t0, $t0, $t3                               # increment x memory space; in memory space incrementing x means x + 16
+        beq $t0, $t2, after_drop_all_rows_above_inner_loop
+        j drop_all_rows_above_inner_loop
+    
+    after_drop_all_rows_above_inner_loop:
+    addi $t0, $zero, 0          # reset x memory space index
+
+    addi $t1, $t1, 1      # increment y; outer loop mem and screen space index
+    beq  $t1, $t3, after_drop_all_rows_above_outer_loop
+    j drop_all_rows_above_outer_loop
+
+
+# COMMON SHAPE STRUCTURE :
+# | C | D |
+# | A | B |
+
+# v1 => Shape Peice Function Selector                   (INTERNAL)
+# v2 => Direction/Offset of Shape Movement          (INPUT)          [-1 = Down, +16 = Right, -16 = Left]
+# v3 => Shape Border Check Mask                     (INPUT)          [15 = Down,  15 = Right, 240 = Left
+# t0 => Memory Location                                 (INTERNAL)
+# t1 => Shape Peice State                               (INTERNAL)
+# t2 => Value of Moving State                           (INTERNAL)   [CONSTANT = 2]
+# t3 => Temporary Value                                 (INTERNAL)
+# t4 => Border Check Leftover Value Check           (INPUT)          [0 = Down, 0 = Left, 7 = Right]
+
+move_shape_if_valid:
+    addi $t2, $zero, 2  # moving state is 2
+
+    # $v1 is the shape peice selector (0 = A, 1 = B, 2 = C, 3 = D)
+
+    addi $v1, $zero, 0  # Select peice A move function return
+    addi $t0, $shape, 0 # mem location of shape
+    lw $t1, 0($t0) # A
+    beq $t1, $t2, check_if_shape_move_valid_peice
+    after_check_if_shape_move_valid_A:
+
+    addi $v1, $zero, 1  # B
+    addi $t0, $shape, 16  # move to B
+    lw $t1, 0($t0) # B
+    beq $t1, $t2, check_if_shape_move_valid_peice
+    after_check_if_shape_move_valid_B:
+
+    addi $v1, $zero, 2  # C
+    addi $t0, $shape, 1  # move to C
+    lw $t1, 0($t0) # D
+    beq $t1, $t2, check_if_shape_move_valid_peice
+    after_check_if_shape_move_valid_C:
+
+    addi $v1, $zero, 3  # D
+    addi $t0, $shape, 17  # move to D
+    lw $t1, 0($t0) # E
+    beq $t1, $t2, check_if_shape_move_valid_peice
+    after_check_if_shape_move_valid_D:
+
+    # If reached here, shape can move down. So move it move it.
+    j move_shape
+    after_move_shape:
+    addi $v2, $v2, 1
+    j dont_make_shape_static
+    
+
+    # shape cannot move down, make it static
+    shape_move_not_valid:
+    addi $v2, $v2, 1
+    beq $v2, $zero, make_shape_static
+    after_make_shape_static:
+
+    dont_make_shape_static:
+
+    beq $v2, $zero, after_shape_move_shape_if_valid_down
+    j after_move_shape_if_valid_left_right 
+    
+
+
+check_if_shape_move_valid_peice:
+    and $t3, $t0, $v3                                   # after removing last 4 bits if we get zero that means our shape is already at floor
+    beq $t3, $t4, shape_move_not_valid                  # clashing with border cant move there
+    add $t0, $t0, $v2                                   # move down/left/right
+    lw $t1, 0($t0)                                      # check if A's new location is empty
+    addi $t3, $zero, 1
+    beq $t1, $t3, shape_move_not_valid                  # if 1 there is static shape cant move there
+    
+    beq $v1, $zero, after_check_if_shape_move_valid_A
+    addi $t3, $zero, 1
+    beq $v1, $t3, after_check_if_shape_move_valid_B
+    addi $t3, $zero, 2
+    beq $v1, $t3, after_check_if_shape_move_valid_C
+    addi $t3, $zero, 3
+    beq $v1, $t3, after_check_if_shape_move_valid_D
+
+
+# COMMON SHAPE STRUCTURE :
+# | C | D |
+# | A | B |
+
+# v2 => Direction/Offset of Shape Movement          (INPUT)          [-1 = Down, +16 = Right, -16 = Left]
+# t0 => Memory Location                                 (INTERNAL)
+# t1 => Shape Peice State                               (INTERNAL)
+# t2 => Value of Moving State                           (INTERNAL)   [CONSTANT = 2]
+
+move_shape:
+    addi $t2, $zero, 2          # moving state is 2
+    addi $sp, $sp, -4           # make space for 4 values in stack
+
+    addi $t0, $shape, 0         # mem location of A
+    lw $t1, 0($t0)              # A
+    sw $t1, 0($sp)              # save A in stack --> .... A]
+    bneq $t1, $t2, skip_erasing_A
+    sw $zero, 0($t0)            # make A empty
+    skip_erasing_A:
+
+    addi $t0, $shape, 16        # mem location of B
+    lw $t1, 0($t0)              # B
+    sw $t1, 1($sp)              # save B in stack --> .... B A]
+    bneq $t1, $t2, skip_erasing_B
+    sw $zero, 0($t0)            # make B empty
+    skip_erasing_B:
+
+    addi $t0, $shape, 1         # mem location of C
+    lw $t1, 0($t0)              # C
+    sw $t1, 2($sp)              # save C in stack --> .... C B A]
+    bneq $t1, $t2, skip_erasing_C
+    sw $zero, 0($t0)            # make C empty
+    skip_erasing_C:
+
+    addi $t0, $shape, 17        # mem location of D
+    lw $t1, 0($t0)              # D
+    sw $t1, 3($sp)              # save D in stack --> .... D C B A]
+    bneq $t1, $t2, skip_erasing_D
+    sw $zero, 0($t0)            # make D empty
+    skip_erasing_D:
+
+    add $shape, $shape, $v2    # move shape pointer
+
+    addi $t0, $shape, 17
+    lw $t1, 3($sp)              # D from stack --> .... C B A]
+    bneq $t1, $t2, skip_overwriting_D
+    sw $t1, 0($t0)              # set D to new location
+    skip_overwriting_D:
+
+    addi $t0, $shape, 1
+    lw $t1, 2($sp)              # C from stack --> .... B A]
+    bneq $t1, $t2, skip_overwriting_C
+    sw $t1, 0($t0)              # set C to new location
+    skip_overwriting_C:
+
+    addi $t0, $shape, 16
+    lw $t1, 1($sp)              # B from stack --> .... A]
+    bneq $t1, $t2, skip_overwriting_B
+    sw $t1, 0($t0)              # set B to new location
+    skip_overwriting_B:
+
+    addi $t0, $shape, 0
+    lw $t1, 0($sp)              # A from stack --> ....]
+    bneq $t1, $t2, skip_overwriting_A
+    sw $t1, 0($t0)              # set A to new location
+    skip_overwriting_A:
+
+    addi $sp, $sp, 4            # pop stack
+
+    j after_move_shape
+
+# COMMON SHAPE STRUCTURE :
+# | C | D |
+# | A | B |
+make_shape_static:
+    addi $t2, $zero, 2
+    addi $t3, $zero, 1
+    addi $t4, $zero, -1
+
+    beq $shape, $t4, after_make_shape_static # shape already static
+
+    addi $t0, $shape, 0
+    lw $t1, 0($t0)
+    bneq $t1, $t2, already_static_A
+    sw $t3, 0($t0)
+    already_static_A:
+
+    addi $t0, $shape, 16
+    lw $t1, 0($t0)
+    bneq $t1, $t2, already_static_B
+    sw $t3, 0($t0)
+    already_static_B:
+
+    addi $t0, $shape, 1
+    lw $t1, 0($t0)
+    bneq $t1, $t2, already_static_C
+    sw $t3, 0($t0)
+    already_static_C:
+
+    addi $t0, $shape, 17
+    lw $t1, 0($t0)
+    bneq $t1, $t2, already_static_D
+    sw $t3, 0($t0)
+    already_static_D:
+    
+    addi $shape, $zero, -1 # make shape static flag
+
+    j after_make_shape_static 
+
+# PARAMS:
+# t0 => x memory space indexing (inner loop)
+# v1 => X screen space indexing (inner loop)
+# t1 => y memory and screen space indexing (outer loop)
+# t2 => max inner loop index [CONSTANT = 8]
+# t3 => max outer loop index [CONSTANT = 16]
+# t4 => temp value
+# v2 => 1 = Row Full, 0 = Row Not Full
+# RETURNS:
+# v3 => memory index of the full row , -1 if no full row
+
+# for each row 
+draw_screen_simulation_outer_loop:
+    # loop through each row
+    draw_screen_simulation_inner_loop:
+        add $t4, $t0, $t1                               # memory index : (x + y) in memory space
+        lw $v0, 0($t4)                                  # memory value
+        bneq $v0, $zero, send_shape_pixel_to_display    # if not empty send to display                              # row is not full
+        after_send_pixel_to_display:        
+        
+        addi $v0, $v0, -1
+        beq $v0, $zero, this_pixel_full
+        addi $v2, $zero, 0                              # this row is not full
+        this_pixel_full:
+
+        add $t0, $t0, $t3                               # increment x memory space; in memory space incrementing x means x + 16
+        addi $v1, $v1, 1                                # increment x screen space; screen space is always normal cartesian cord
+        beq $v1, $t2, after_draw_screen_simulation_inner_loop
+        j draw_screen_simulation_inner_loop
+
+    after_draw_screen_simulation_inner_loop:
+
+    addi $t0, $zero, 0    # reset x memory space index
+    addi $v1, $zero, 0    # reset x screen space index
+
+    # check if any row is full 
+    bneq $v2, $zero, found_full_row
+    after_found_full_row:
+    addi $v2, $zero, 1    # assume row is full
+
+    addi $t1, $t1, 1                                        # increment y; outer loop mem and screen space index
+    beq $t1, $t3, after_draw_screen_simulation_outer_loop
+    j draw_screen_simulation_outer_loop
+
+send_shape_pixel_to_display:
+    sw $v1, 0($io)      # send x to display
+    sw $t1, 1($io)      # send y to display
+    sw $zero, 2($io)    # update display
+    j after_send_pixel_to_display
+
+found_full_row:
+    add $v3, $t0, $t1   # memory index of the full row (x + y) in memory space
+    j after_found_full_row
+
+spawn_shape:
+    # spawn cords are fixed (3, 14) bottom left corner of 2 x 3 spawn zone
+    addi $t1, $zero, 2  # moving shape
+
+    # generate a random number between 0 - 7
+    # number to shape mapping:
+    # 0 = O, 1 = L, 2 = J, 3 = 7, 4 = I, 5 = O, 6 = L, 7 = J
+    lw $t0, 15($io)     # get random number
+    andi $t0, $t0, 7    # get last 3 bits
+
+    addi $t2, $zero, 0
+    beq $t0, $t2, spawn_shape_o
+    addi $t2, $zero, 1
+    beq $t0, $t2, spawn_shape_l
+    addi $t2, $zero, 2
+    beq $t0, $t2, spawn_shape_j
+    addi $t2, $zero, 3
+    beq $t0, $t2, spawn_shape_7
+    addi $t2, $zero, 4
+    beq $t0, $t2, spawn_shape_i
+    addi $t2, $zero, 5
+    beq $t0, $t2, spawn_shape_o
+    addi $t2, $zero, 6
+    beq $t0, $t2, spawn_shape_i
+    
+    j spawn_shape_o
+
+    after_spawn_shape_specific:
+
+    # bottom-left corner is the reference point
+    addi $shape, $zero, 62 
+
+    j after_spawn_shape
+
+# COMMON SHAPE SPAWN CODE 
+# | C | D |
+# | A | B |
+# spawn_common_shape:
+#     addi $t0, $zero, 62   # (3, 14) at memory = 3 * 16 + 14 = 62   # A
+#     sw $t1, 0($t0)        # set the shape at (3, 14)
+#     addi $t0, $zero, 63   # (3, 15) at memory = 3 * 16 + 15 = 63   # C
+#     sw $t1, 0($t0)        # set the shape at (3, 15)
+#     addi $t0, $zero, 78   # (4, 14) at memory = 4 * 16 + 14 = 78   # B
+#     sw $t1, 0($t0)        # set the shape at (4, 14)
+#     addi $t0, $zero, 79   # (4, 15) at memory = 4 * 16 + 15 = 79   # D
+#     sw $t1, 0($t0)        # set the shape at (4, 15)
+#     j after_spawn_shape_specific
+
+spawn_shape_o:
+    addi $t0, $zero, 62     # (3, 14) at memory = 3 * 16 + 14 = 62   # A
+    sw $t1, 0($t0)          # set the shape at (3, 14)
+    addi $t0, $zero, 63     # (3, 15) at memory = 3 * 16 + 15 = 63   # C
+    sw $t1, 0($t0)          # set the shape at (3, 15)
+    addi $t0, $zero, 78     # (4, 14) at memory = 4 * 16 + 14 = 78   # B
+    sw $t1, 0($t0)          # set the shape at (4, 14)
+    addi $t0, $zero, 79     # (4, 15) at memory = 4 * 16 + 15 = 79   # D
+    sw $t1, 0($t0)          # set the shape at (4, 15)
+    j after_spawn_shape_specific
+
+spawn_shape_l:
+    addi $t0, $zero, 62     # (3, 14) at memory = 3 * 16 + 14 = 62   # A
+    sw $t1, 0($t0)          # set the shape at (3, 14)
+    addi $t0, $zero, 63     # (3, 15) at memory = 3 * 16 + 15 = 63   # C
+    sw $t1, 0($t0)          # set the shape at (3, 15)
+    addi $t0, $zero, 78     # (4, 14) at memory = 4 * 16 + 14 = 78   # B
+    sw $t1, 0($t0)          # set the shape at (4, 14)
+    j after_spawn_shape_specific
+
+spawn_shape_j:
+    addi $t0, $zero, 62     # (3, 14) at memory = 3 * 16 + 14 = 62   # A
+    sw $t1, 0($t0)          # set the shape at (3, 14)
+    addi $t0, $zero, 78     # (4, 14) at memory = 4 * 16 + 14 = 78   # B
+    sw $t1, 0($t0)          # set the shape at (4, 14)
+    addi $t0, $zero, 79     # (4, 15) at memory = 4 * 16 + 15 = 79   # D
+    sw $t1, 0($t0)          # set the shape at (4, 15)
+    j after_spawn_shape_specific
+
+spawn_shape_7:
+    addi $t0, $zero, 63     # (3, 15) at memory = 3 * 16 + 15 = 63   # C
+    sw $t1, 0($t0)          # set the shape at (3, 15)
+    addi $t0, $zero, 78     # (4, 14) at memory = 4 * 16 + 14 = 78   # B
+    sw $t1, 0($t0)          # set the shape at (4, 14)
+    addi $t0, $zero, 79     # (4, 15) at memory = 4 * 16 + 15 = 79   # D
+    sw $t1, 0($t0)          # set the shape at (4, 15)
+    j after_spawn_shape_specific
+
+spawn_shape_i:
+    addi $t0, $zero, 62     # (3, 14) at memory = 3 * 16 + 14 = 62   # A
+    sw $t1, 0($t0)          # set the shape at (3, 14)
+    addi $t0, $zero, 63     # (3, 15) at memory = 3 * 16 + 15 = 63   # C
+    sw $t1, 0($t0)          # set the shape at (3, 15)
+    j after_spawn_shape_specific
+
+draw_screen_border_loop:
+    sw $t0, 0($io)                                  # send x to display
+    sw $t1, 1($io)                                  # send y to display
+    sw $zero, 2($io)                                # update display
+    beq $t1, $t2, after_draw_screen_border_loop     # if y = 15 we reached screen border
+    addi $t1, $t1, 1                                # increment y
+    j draw_screen_border_loop
+
+exit:

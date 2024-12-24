@@ -62,8 +62,9 @@ main:
 
 
 game_loop:    
-    ### RIGHT BORDER AT (8, ...) CORD
-    addi $t0, $zero, 8 # x = 8
+    ### LEFT BORDER AT (3, ...) AND RIGHT BORDER AT (8, ...) CORD
+    addi $t0, $zero, 11 # x1 = 12
+    addi $t3, $zero, 20  # x2 = 3
     addi $t1, $zero, 0 # y = 0
     addi $t2, $zero, 15 # y = 15 max y limit
     j draw_screen_border_loop
@@ -93,10 +94,10 @@ game_loop:
     after_clear_row_and_drop:
 
 
-    # ### FLUSH DISPLAY
+    ### FLUSH DISPLAY
     sw $zero, 3($io)  # flush display
 
-        ### MOVE SHAPE 
+    ### MOVE SHAPE 
     # { PARAM : $v2 = Direction/Offset, 
     #           $v3 = Border Check Mask, 
     #           $t4 = Border Check Leftover Value Check }
@@ -408,7 +409,8 @@ draw_screen_simulation_outer_loop:
     j draw_screen_simulation_outer_loop
 
 send_shape_pixel_to_display:
-    sw $v1, 0($io)      # send x to display
+    addi $t4, $v1, 12   # shift x by 12 pixel right to center the game
+    sw $t4, 0($io)      # send x to display
     sw $t1, 1($io)      # send y to display
     sw $zero, 2($io)    # update display
     j after_send_pixel_to_display
@@ -440,14 +442,9 @@ spawn_shape:
     addi $t2, $zero, 5
     beq $t0, $t2, spawn_shape_o
     addi $t2, $zero, 6
-    beq $t0, $t2, spawn_shape_l
-    addi $t2, $zero, 7
-    beq $t0, $t2, spawn_shape_j
+    beq $t0, $t2, spawn_shape_i
     
     j spawn_shape_o
-
-    ### TEMP
-    j spawn_shape_i
 
     after_spawn_shape_specific:
 
@@ -460,67 +457,70 @@ spawn_shape:
 # | C | D |
 # | A | B |
 # spawn_common_shape:
-#     addi $t0, $zero, 62 # (3, 14) at memory = 3 * 16 + 14 = 62   # A
-#     sw $t1, 0($t0)      # set the shape at (3, 14)
-#     addi $t0, $zero, 63 # (3, 15) at memory = 3 * 16 + 15 = 63   # C
-#     sw $t1, 0($t0)      # set the shape at (3, 15)
-#     addi $t0, $zero, 78 # (4, 14) at memory = 4 * 16 + 14 = 78   # B
-#     sw $t1, 0($t0)      # set the shape at (4, 14)
-#     addi $t0, $zero, 79 # (4, 15) at memory = 4 * 16 + 15 = 79   # D
-#     sw $t1, 0($t0)      # set the shape at (4, 15)
+#     addi $t0, $zero, 62   # (3, 14) at memory = 3 * 16 + 14 = 62   # A
+#     sw $t1, 0($t0)        # set the shape at (3, 14)
+#     addi $t0, $zero, 63   # (3, 15) at memory = 3 * 16 + 15 = 63   # C
+#     sw $t1, 0($t0)        # set the shape at (3, 15)
+#     addi $t0, $zero, 78   # (4, 14) at memory = 4 * 16 + 14 = 78   # B
+#     sw $t1, 0($t0)        # set the shape at (4, 14)
+#     addi $t0, $zero, 79   # (4, 15) at memory = 4 * 16 + 15 = 79   # D
+#     sw $t1, 0($t0)        # set the shape at (4, 15)
 #     j after_spawn_shape_specific
 
 spawn_shape_o:
-    addi $t0, $zero, 62 # (3, 14) at memory = 3 * 16 + 14 = 62   # A
-    sw $t1, 0($t0)      # set the shape at (3, 14)
-    addi $t0, $zero, 63 # (3, 15) at memory = 3 * 16 + 15 = 63   # C
-    sw $t1, 0($t0)      # set the shape at (3, 15)
-    addi $t0, $zero, 78 # (4, 14) at memory = 4 * 16 + 14 = 78   # B
-    sw $t1, 0($t0)      # set the shape at (4, 14)
-    addi $t0, $zero, 79 # (4, 15) at memory = 4 * 16 + 15 = 79   # D
-    sw $t1, 0($t0)      # set the shape at (4, 15)
+    addi $t0, $zero, 62     # (3, 14) at memory = 3 * 16 + 14 = 62   # A
+    sw $t1, 0($t0)          # set the shape at (3, 14)
+    addi $t0, $zero, 63     # (3, 15) at memory = 3 * 16 + 15 = 63   # C
+    sw $t1, 0($t0)          # set the shape at (3, 15)
+    addi $t0, $zero, 78     # (4, 14) at memory = 4 * 16 + 14 = 78   # B
+    sw $t1, 0($t0)          # set the shape at (4, 14)
+    addi $t0, $zero, 79     # (4, 15) at memory = 4 * 16 + 15 = 79   # D
+    sw $t1, 0($t0)          # set the shape at (4, 15)
     j after_spawn_shape_specific
 
 spawn_shape_l:
-    addi $t0, $zero, 62 # (3, 14) at memory = 3 * 16 + 14 = 62   # A
-    sw $t1, 0($t0)      # set the shape at (3, 14)
-    addi $t0, $zero, 63 # (3, 15) at memory = 3 * 16 + 15 = 63   # C
-    sw $t1, 0($t0)      # set the shape at (3, 15)
-    addi $t0, $zero, 78 # (4, 14) at memory = 4 * 16 + 14 = 78   # B
-    sw $t1, 0($t0)      # set the shape at (4, 14)
+    addi $t0, $zero, 62     # (3, 14) at memory = 3 * 16 + 14 = 62   # A
+    sw $t1, 0($t0)          # set the shape at (3, 14)
+    addi $t0, $zero, 63     # (3, 15) at memory = 3 * 16 + 15 = 63   # C
+    sw $t1, 0($t0)          # set the shape at (3, 15)
+    addi $t0, $zero, 78     # (4, 14) at memory = 4 * 16 + 14 = 78   # B
+    sw $t1, 0($t0)          # set the shape at (4, 14)
     j after_spawn_shape_specific
 
 spawn_shape_j:
-    addi $t0, $zero, 62 # (3, 14) at memory = 3 * 16 + 14 = 62   # A
-    sw $t1, 0($t0)      # set the shape at (3, 14)
-    addi $t0, $zero, 78 # (4, 14) at memory = 4 * 16 + 14 = 78   # B
-    sw $t1, 0($t0)      # set the shape at (4, 14)
-    addi $t0, $zero, 79 # (4, 15) at memory = 4 * 16 + 15 = 79   # D
-    sw $t1, 0($t0)      # set the shape at (4, 15)
+    addi $t0, $zero, 62     # (3, 14) at memory = 3 * 16 + 14 = 62   # A
+    sw $t1, 0($t0)          # set the shape at (3, 14)
+    addi $t0, $zero, 78     # (4, 14) at memory = 4 * 16 + 14 = 78   # B
+    sw $t1, 0($t0)          # set the shape at (4, 14)
+    addi $t0, $zero, 79     # (4, 15) at memory = 4 * 16 + 15 = 79   # D
+    sw $t1, 0($t0)          # set the shape at (4, 15)
     j after_spawn_shape_specific
 
 spawn_shape_7:
-    addi $t0, $zero, 63 # (3, 15) at memory = 3 * 16 + 15 = 63   # C
-    sw $t1, 0($t0)      # set the shape at (3, 15)
-    addi $t0, $zero, 78 # (4, 14) at memory = 4 * 16 + 14 = 78   # B
-    sw $t1, 0($t0)      # set the shape at (4, 14)
-    addi $t0, $zero, 79 # (4, 15) at memory = 4 * 16 + 15 = 79   # D
-    sw $t1, 0($t0)      # set the shape at (4, 15)
+    addi $t0, $zero, 63     # (3, 15) at memory = 3 * 16 + 15 = 63   # C
+    sw $t1, 0($t0)          # set the shape at (3, 15)
+    addi $t0, $zero, 78     # (4, 14) at memory = 4 * 16 + 14 = 78   # B
+    sw $t1, 0($t0)          # set the shape at (4, 14)
+    addi $t0, $zero, 79     # (4, 15) at memory = 4 * 16 + 15 = 79   # D
+    sw $t1, 0($t0)          # set the shape at (4, 15)
     j after_spawn_shape_specific
 
 spawn_shape_i:
-    addi $t0, $zero, 62 # (3, 14) at memory = 3 * 16 + 14 = 62   # A
-    sw $t1, 0($t0)      # set the shape at (3, 14)
-    addi $t0, $zero, 63 # (3, 15) at memory = 3 * 16 + 15 = 63   # C
-    sw $t1, 0($t0)      # set the shape at (3, 15)
+    addi $t0, $zero, 62     # (3, 14) at memory = 3 * 16 + 14 = 62   # A
+    sw $t1, 0($t0)          # set the shape at (3, 14)
+    addi $t0, $zero, 63     # (3, 15) at memory = 3 * 16 + 15 = 63   # C
+    sw $t1, 0($t0)          # set the shape at (3, 15)
     j after_spawn_shape_specific
 
 draw_screen_border_loop:
-    sw $t0, 0($io)    # send x to display
-    sw $t1, 1($io)    # send y to display
-    sw $zero, 2($io)  # update display
-    beq $t1, $t2, after_draw_screen_border_loop
-    addi $t1, $t1, 1
+    sw $t0, 0($io)                                  # send x1 to display
+    sw $t1, 1($io)                                  # send y to display
+    sw $zero, 2($io)                                # update display
+    sw $t3, 0($io)                                  # send x2 to display
+    sw $t1, 1($io)                                  # send y to display
+    sw $zero, 2($io)                                # update display
+    beq $t1, $t2, after_draw_screen_border_loop     # if y = 15 we reached screen border
+    addi $t1, $t1, 1                                # increment y
     j draw_screen_border_loop
 
 exit:

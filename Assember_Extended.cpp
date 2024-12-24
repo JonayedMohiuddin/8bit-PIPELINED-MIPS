@@ -470,8 +470,8 @@ int main()
     // take file name input (might have space)
     string filename;
     cout << "Enter the file name (In Aassembly\\ directory): ";
-    // getline(cin, filename);
-    filename = "TETRIS_GAME.mips";
+    getline(cin, filename);
+    // filename = "TETRIS_GAME.mips";
 
     // if no extension given add .mips
     if(filename.find(".") == string::npos)

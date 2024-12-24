@@ -4,7 +4,8 @@ using namespace std;
 // Map for opcodes
 unordered_map<string, string> opcodeMap = {
     {"sub", "0000"},  {"srl", "0001"},  {"andi", "0010"}, 
-    {"ori", "0011"},  {"nor", "0100"},  {"bneq", "0101"}, 
+    {"ori", "0011"},  {"nor", "0100"},  
+    {"bneq", "0101"}, 
     {"and", "0110"},  {"beq", "0111"},  {"sw", "1000"}, 
     {"subi", "1001"}, {"addi", "1010"}, {"sll", "1011"}, 
     {"add", "1100"},  {"lw", "1101"},   {"or", "1110"}, 
@@ -244,12 +245,14 @@ string getBinary(vector<string> tokens, int lineNumber, bool debug = false)
         }
         else 
         {
+            // check if the label is valid
+            checkValidLabel(jumpAddress);
             address = labelMap[jumpAddress];
         }
 
         binary = opcode + toBinary(address, 8) + "00000000";
         
-        if(debug) cerr << "JMP " << opcode << " " << toBinary(address, 8) << " " << "00000000" << endl;
+        if(debug) cerr << lineNumber << " : " << "JMP " << opcode << " " << toBinary(address, 8) << " " << "00000000" << endl;
     }
     else if (tokens[0] == "sub" || tokens[0] == "and" || tokens[0] == "or" || 
              tokens[0] == "nor" || tokens[0] == "add") 
@@ -272,7 +275,7 @@ string getBinary(vector<string> tokens, int lineNumber, bool debug = false)
 
         binary = opcode + registerMap[rs] + registerMap[rt] + registerMap[rd] + "0000";
 
-        if(debug) cerr << tokens[0] << " " << opcode << " " << registerMap[rs] << " " << registerMap[rt] << " " << registerMap[rd] << " " << "0000" << endl;
+        if(debug) cerr << lineNumber << " : " << tokens[0] << " " << opcode << " " << registerMap[rs] << " " << registerMap[rt] << " " << registerMap[rd] << " " << "0000" << endl;
     }
     else if (tokens[0] == "srl" || tokens[0] == "sll")
     {
@@ -297,7 +300,7 @@ string getBinary(vector<string> tokens, int lineNumber, bool debug = false)
         // WHEN SHIFTING USE RS AS NUMBER , RT AS DESTINATION REGISTER , SHIFT AMOUNT AS SHIFT AMOUNT
         binary = opcode + registerMap[rt] + registerMap[rd] + toBinary(shiftAmount, 8);
 
-        if(debug) cerr << tokens[0] << " " << opcode << " " << registerMap[rt] << " " << registerMap[rd] << " " << toBinary(shiftAmount, 8) << endl;
+        if(debug) cerr << lineNumber << " : " << tokens[0] << " " << opcode << " " << registerMap[rt] << " " << registerMap[rd] << " " << toBinary(shiftAmount, 8) << endl;
     }
     else if(tokens[0] == "addi" || tokens[0] == "subi" || 
             tokens[0] == "andi" || tokens[0] == "ori")
@@ -321,7 +324,7 @@ string getBinary(vector<string> tokens, int lineNumber, bool debug = false)
 
         binary = opcode + registerMap[rs] + registerMap[rt] + toBinary(immediate, 8);
 
-        if(debug) cerr << tokens[0] << " " << opcode << " " << registerMap[rs] << " " << registerMap[rt] << " " << toBinary(immediate, 8) << endl;
+        if(debug) cerr << lineNumber << " : " << tokens[0] << " " << opcode << " " << registerMap[rs] << " " << registerMap[rt] << " " << toBinary(immediate, 8) << endl;
     }
     else if(tokens[0] == "lw" || tokens[0] == "sw")
     {
@@ -346,7 +349,7 @@ string getBinary(vector<string> tokens, int lineNumber, bool debug = false)
         // binaryInstruction = opcode + registerMap[rs] + registerMap[rt] + toBinary(immediate, 8);
         binary = opcode + registerMap[rs] + registerMap[rt] + toBinary(immediate, 8);
 
-        if(debug) cerr << tokens[0] << " " << opcode << " " << registerMap[rs] << " " << registerMap[rt] << " " << toBinary(immediate, 8) << endl;
+        if(debug) cerr << lineNumber << " : " << tokens[0] << " " << opcode << " " << registerMap[rs] << " " << registerMap[rt] << " " << toBinary(immediate, 8) << endl;
     }
     else if(tokens[0] == "beq" || tokens[0] == "bneq")
     {
@@ -374,10 +377,21 @@ string getBinary(vector<string> tokens, int lineNumber, bool debug = false)
         if(offset < 0) offset = 256 + offset;
 
         binary = opcode + registerMap[rs] + registerMap[rt] + toBinary(offset, 8);
-        if(debug) cerr << tokens[0] << " " << opcode << " " << registerMap[rs] << " " << registerMap[rt] << " " << toBinary(offset, 8) << endl;
+        if(debug) cerr << lineNumber << " : " << tokens[0] << " " << opcode << " " << registerMap[rs] << " " << registerMap[rt] << " " << toBinary(offset, 8) << endl;
     }
     else { 
-        // DO NOTHING
+        // check if it is a label
+        if(tokens.size() > 0 && tokens[0].size() > 0 && tokens[0].back() == ':')
+        {
+            // ignore labels
+            return "";
+        }
+        else
+        {
+            cerr << "!! Invalid instruction: " << tokens[0] << endl;
+            cerr << "Exiting program..." << endl;
+            exit(1);
+        }
     }
 
     return binary;
@@ -404,11 +418,12 @@ int assembleFile(string inputFileName, string outputFileName, bool debug = false
     vector<string> lines = readFile(inputFileName);
 
     // Set $sp to the highest memory address available
-    lines.insert(lines.begin(), "addi $sp, $zero, 159");
+    lines.insert(lines.begin(), "addi $sp, $zero, 239");
     // For IO ports
-    lines.insert(lines.begin(), "addi $io, $zero, 160");
+    lines.insert(lines.begin(), "addi $io, $zero, 240");
 
     lines = renameRegisters(lines);
+
     updateLabelMaps(lines, debug);
 
     // for (string line : lines) cerr << line << endl;
@@ -422,9 +437,11 @@ int assembleFile(string inputFileName, string outputFileName, bool debug = false
             string binary = getBinary(tokens, lineNumber, debug);
             if(!binary.empty() && binary != "\n" && binary != "")
             {
-                outputFile << binaryToHex(binary) << endl;
+                outputFile << binaryToHex(binary);
                 lineNumber++;
-            }
+                if(lineNumber % 8 == 0) outputFile << endl;
+                else outputFile << " ";
+            }   
         }
     }
 
@@ -454,6 +471,7 @@ int main()
     string filename;
     cout << "Enter the file name (In Aassembly\\ directory): ";
     getline(cin, filename);
+    // filename = "TETRIS_GAME.mips";
 
     // if no extension given add .mips
     if(filename.find(".") == string::npos)
@@ -461,10 +479,8 @@ int main()
         filename += ".mips";
     }
 
-    string basePath = "..\\ASSEMBLY\\";
-    string outputBasePath = "..\\BINARY\\";
-    
-    // string filename = "SNAKE_GAME.mips";
+    string basePath = "ASSEMBLY\\";
+    string outputBasePath = "BINARY\\";
 
     string inputFileName = basePath + filename;
     string outputFilename = outputBasePath + "BIN_" + filename.substr(0, filename.find("."));

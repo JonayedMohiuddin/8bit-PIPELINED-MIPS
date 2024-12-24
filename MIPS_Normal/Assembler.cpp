@@ -394,8 +394,10 @@ int assembleFile(string inputFileName, string outputFileName, bool debug = false
             string binary = getBinary(tokens, lineNumber, debug);
             if(!binary.empty() && binary != "\n" && binary != "")
             {
-                outputFile << binaryToHex(binary) << endl;
+                outputFile << binaryToHex(binary);
                 lineNumber++;
+                if(lineNumber % 8 == 0) outputFile << endl;
+                else outputFile << " ";
             }
         }
     }
@@ -433,8 +435,8 @@ int main()
         filename += ".mips";
     }
 
-    string basePath = "..\\ASSEMBLY\\";
-    string outputBasePath = "..\\BINARY\\";
+    string basePath = "ASSEMBLY\\";
+    string outputBasePath = "BINARY\\";
     
     // string filename = "SNAKE_GAME.mips";
 
