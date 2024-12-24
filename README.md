@@ -21,7 +21,7 @@ This repository contains an 8-bit MIPS (Microprocessor without Interlocked Pipel
 
 [Assembly code of the game](ASSEMBLY/TETRIS_GAME.mips)
 
-***Will add animation soon***
+<img src="https://github.com/JonayedMohiuddin/8bit-PIPELINED-MIPS/blob/main/IMAGES/TETRIS_GAME_DEMO_MIPS.gif" width="500" height="auto">
 
 ### Hello World with Counter
 
