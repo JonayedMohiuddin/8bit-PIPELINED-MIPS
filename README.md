@@ -47,7 +47,7 @@ This repository contains an 8-bit MIPS (Microprocessor without Interlocked Pipel
 
 ## Features
 
-### Instruction Set
+<!-- ### Instruction Set
 The MIPS processor supports the following instructions:
 
 | Opcode | Binary | Category    | Instruction | Format |
@@ -69,28 +69,35 @@ The MIPS processor supports the following instructions:
 | 14     | 1110   | Logic       | `or`        | R      |
 | 15     | 1111   | Control     | `j`         | J      |
 
----
+--- -->
 
-### Instruction Set Usages
+### Instruction Set and Their Usages
+
+Here `dest`, `src1`, `src2`, `base` are all registers. `imm` is an 8-bit signed immediate value. `offset` is an 4-bit signed immediate value. `label` is either a label in the code or an immediate value. 
 
 | Instruction    | Example                             | Description                                                    |
 |----------------|-------------------------------------|----------------------------------------------------------------|
-| `addi`         | `addi dest_reg, src_reg, imm`       | Add immediate value `imm` to `src_reg`, store in `dest_reg` |
-| `sub`          | `sub dest_reg, src_reg1, src_reg2`  | Subtract `src_reg2` from `src_reg1`, store result in `dest_reg` |
-| `srl`          | `srl dest_reg, src_reg1, src_reg2`  | Shift `src_reg` right by `src_reg2` bits, store result in `dest_reg` |
-| `andi`         | `andi dest_reg, src_reg, imm`       | Perform bitwise AND between `src_reg` and `imm`, store in `dest_reg` |
-| `ori`          | `ori dest_reg, src_reg, imm`        | Perform bitwise OR between `src_reg` and `imm`, store in `dest_reg` |
-| `nor`          | `nor dest_reg, src_reg1, src_reg2`  | Perform bitwise NOR between `src_reg1` and `src_reg2`, store in `dest_reg` |
-| `bneq`         | `bneq src_reg1, src_reg2, label`    | Branch if `src_reg1` is not equal to `src_reg2`, to `label` |
-| `beq`          | `beq src_reg1, src_reg2, label`     | Branch if `src_reg1` is equal to `src_reg2`, to `label`  |
-| `sw`           | `sw src_reg, offset(base_reg)`      | Store word from `src_reg` to memory at address `base_reg + offset` |
-| `subi`         | `subi dest_reg, src_reg, imm`       | Subtract immediate value `imm` from `src_reg`, store in `dest_reg` |
-| `addi`         | `addi dest_reg, src_reg, imm`       | Add immediate value `imm` to `src_reg`, store in `dest_reg` |
-| `sll`          | `sll dest_reg, src_reg, src_reg2`   | Shift `src_reg` left by `src_reg2` bits, store result in `dest_reg` |
-| `add`          | `add dest_reg, src_reg1, src_reg2`  | Add `src_reg1` and `src_reg2`, store result in `dest_reg` |
-| `lw`           | `lw dest_reg, offset(base_reg)`     | Load word from memory at address `base_reg + offset` into `dest_reg` |
-| `or`           | `or dest_reg, src_reg1, src_reg2`   | Perform bitwise OR between `src_reg1` and `src_reg2`, store in `dest_reg` |
-| `j`            | `j target`                          | Jump to address `target`                                 |
+| `add`          | `add dest, src1, src2`              | Add `src1` and `src2`, store result in `dest` |
+| `sub`          | `sub dest, src1, src2`              | Subtract `src2` from `src1`, store result in `dest` |
+| `and`          | `and dest, src1, src2`              | Perform bitwise AND between `src1` and `src2`, store in `dest` |
+| `or`           | `or dest, src1, src2`               | Perform bitwise OR between `src1` and `src2`, store in `dest` |
+| `nor`          | `nor dest, src1, src2`              | Perform bitwise NOR between `src1` and `src2`, store in `dest` |
+            
+| `addi`         | `addi dest, src, imm`               | Add immediate value `imm` to `src`, store in `dest` |
+| `subi`         | `subi dest, src, imm`               | Subtract immediate value `imm` from `src`, store in `dest` |
+| `andi`         | `andi dest, src, imm`               | Perform bitwise AND between `src` and `imm`, store in `dest` |
+| `ori`          | `ori dest, src, imm`                | Perform bitwise OR between `src` and `imm`, store in `dest` |
+            
+| `sll`          | `sll dest, src, src2`               | Shift `src` left by `src2` bits, store result in `dest` |
+| `srl`          | `srl dest, src1, src2`              | Shift `src` right by `src2` bits, store result in `dest` |
+
+| `beq`          | `beq src1, src2, label`             | Branch if `src1` is equal to `src2`, to `label`  |
+| `bneq`         | `bneq src1, src2, label`            | Branch if `src1` is not equal to `src2`, to `label` |
+
+| `sw`           | `sw src, offset(base)`              | Store word from `src` to memory at address `base + offset` |
+| `lw`           | `lw dest, offset(base)`             | Load word from memory at address `base + offset` into `dest` |
+
+| `j`            | `j label`                           | Jump to address `label`                                 |
 
 
 ---
