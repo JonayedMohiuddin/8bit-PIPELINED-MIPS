@@ -88,10 +88,10 @@ Here `dest`, `src1`, `src2`, `base` are all registers. `imm` is an 8-bit signed 
 | `ori`          | `ori dest, src, imm`                | Perform bitwise OR between `src` and `imm`, store in `dest` |         
 | `sll`          | `sll dest, src, src2`               | Shift `src` left by `src2` bits, store result in `dest` |
 | `srl`          | `srl dest, src1, src2`              | Shift `src` right by `src2` bits, store result in `dest` |
-| `beq`          | `beq src1, src2, label`             | Branch if `src1` is equal to `src2`, to `label`  |
-| `bneq`         | `bneq src1, src2, label`            | Branch if `src1` is not equal to `src2`, to `label` |
 | `sw`           | `sw src, offset(base)`              | Store word from `src` to memory at address `base + offset` |
 | `lw`           | `lw dest, offset(base)`             | Load word from memory at address `base + offset` into `dest` |
+| `beq`          | `beq src1, src2, label`             | Branch if `src1` is equal to `src2`, to `label`  |
+| `bneq`         | `bneq src1, src2, label`            | Branch if `src1` is not equal to `src2`, to `label` |
 | `j`            | `j label`                           | Jump to address `label`                                 |
 
 
