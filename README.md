@@ -73,24 +73,24 @@ The MIPS processor supports the following instructions:
 
 ### Instruction Set Usages
 
-| Instruction    | Format    | Example                             | Description                                                    |
-|----------------|-----------|-------------------------------------|----------------------------------------------------------------|
-| `addi`         | I         | `addi dest_reg, src_reg, imm`       | Add immediate value `imm` to `src_reg`, store in `dest_reg` |
-| `sub`          | R         | `sub dest_reg, src_reg1, src_reg2`  | Subtract `src_reg2` from `src_reg1`, store result in `dest_reg` |
-| `srl`          | R         | `srl dest_reg, src_reg1, src_reg2`  | Shift `src_reg` right by `src_reg2` bits, store result in `dest_reg` |
-| `andi`         | I         | `andi dest_reg, src_reg, imm`       | Perform bitwise AND between `src_reg` and `imm`, store in `dest_reg` |
-| `ori`          | I         | `ori dest_reg, src_reg, imm`        | Perform bitwise OR between `src_reg` and `imm`, store in `dest_reg` |
-| `nor`          | R         | `nor dest_reg, src_reg1, src_reg2`  | Perform bitwise NOR between `src_reg1` and `src_reg2`, store in `dest_reg` |
-| `bneq`         | I         | `bneq src_reg1, src_reg2, label`    | Branch if `src_reg1` is not equal to `src_reg2`, to `label` |
-| `beq`          | I         | `beq src_reg1, src_reg2, label`     | Branch if `src_reg1` is equal to `src_reg2`, to `label`  |
-| `sw`           | I         | `sw src_reg, offset(base_reg)`      | Store word from `src_reg` to memory at address `base_reg + offset` |
-| `subi`         | I         | `subi dest_reg, src_reg, imm`       | Subtract immediate value `imm` from `src_reg`, store in `dest_reg` |
-| `addi`         | I         | `addi dest_reg, src_reg, imm`       | Add immediate value `imm` to `src_reg`, store in `dest_reg` |
-| `sll`          | R         | `sll dest_reg, src_reg, src_reg2`   | Shift `src_reg` left by `src_reg2` bits, store result in `dest_reg` |
-| `add`          | R         | `add dest_reg, src_reg1, src_reg2`  | Add `src_reg1` and `src_reg2`, store result in `dest_reg` |
-| `lw`           | I         | `lw dest_reg, offset(base_reg)`     | Load word from memory at address `base_reg + offset` into `dest_reg` |
-| `or`           | R         | `or dest_reg, src_reg1, src_reg2`   | Perform bitwise OR between `src_reg1` and `src_reg2`, store in `dest_reg` |
-| `j`            | J         | `j target`                          | Jump to address `target`                                 |
+| Instruction    | Example                             | Description                                                    |
+|----------------|-------------------------------------|----------------------------------------------------------------|
+| `addi`         | `addi dest_reg, src_reg, imm`       | Add immediate value `imm` to `src_reg`, store in `dest_reg` |
+| `sub`          | `sub dest_reg, src_reg1, src_reg2`  | Subtract `src_reg2` from `src_reg1`, store result in `dest_reg` |
+| `srl`          | `srl dest_reg, src_reg1, src_reg2`  | Shift `src_reg` right by `src_reg2` bits, store result in `dest_reg` |
+| `andi`         | `andi dest_reg, src_reg, imm`       | Perform bitwise AND between `src_reg` and `imm`, store in `dest_reg` |
+| `ori`          | `ori dest_reg, src_reg, imm`        | Perform bitwise OR between `src_reg` and `imm`, store in `dest_reg` |
+| `nor`          | `nor dest_reg, src_reg1, src_reg2`  | Perform bitwise NOR between `src_reg1` and `src_reg2`, store in `dest_reg` |
+| `bneq`         | `bneq src_reg1, src_reg2, label`    | Branch if `src_reg1` is not equal to `src_reg2`, to `label` |
+| `beq`          | `beq src_reg1, src_reg2, label`     | Branch if `src_reg1` is equal to `src_reg2`, to `label`  |
+| `sw`           | `sw src_reg, offset(base_reg)`      | Store word from `src_reg` to memory at address `base_reg + offset` |
+| `subi`         | `subi dest_reg, src_reg, imm`       | Subtract immediate value `imm` from `src_reg`, store in `dest_reg` |
+| `addi`         | `addi dest_reg, src_reg, imm`       | Add immediate value `imm` to `src_reg`, store in `dest_reg` |
+| `sll`          | `sll dest_reg, src_reg, src_reg2`   | Shift `src_reg` left by `src_reg2` bits, store result in `dest_reg` |
+| `add`          | `add dest_reg, src_reg1, src_reg2`  | Add `src_reg1` and `src_reg2`, store result in `dest_reg` |
+| `lw`           | `lw dest_reg, offset(base_reg)`     | Load word from memory at address `base_reg + offset` into `dest_reg` |
+| `or`           | `or dest_reg, src_reg1, src_reg2`   | Perform bitwise OR between `src_reg1` and `src_reg2`, store in `dest_reg` |
+| `j`            | `j target`                          | Jump to address `target`                                 |
 
 
 ---
