@@ -82,21 +82,16 @@ Here `dest`, `src1`, `src2`, `base` are all registers. `imm` is an 8-bit signed 
 | `and`          | `and dest, src1, src2`              | Perform bitwise AND between `src1` and `src2`, store in `dest` |
 | `or`           | `or dest, src1, src2`               | Perform bitwise OR between `src1` and `src2`, store in `dest` |
 | `nor`          | `nor dest, src1, src2`              | Perform bitwise NOR between `src1` and `src2`, store in `dest` |
-            
 | `addi`         | `addi dest, src, imm`               | Add immediate value `imm` to `src`, store in `dest` |
 | `subi`         | `subi dest, src, imm`               | Subtract immediate value `imm` from `src`, store in `dest` |
 | `andi`         | `andi dest, src, imm`               | Perform bitwise AND between `src` and `imm`, store in `dest` |
-| `ori`          | `ori dest, src, imm`                | Perform bitwise OR between `src` and `imm`, store in `dest` |
-            
+| `ori`          | `ori dest, src, imm`                | Perform bitwise OR between `src` and `imm`, store in `dest` |         
 | `sll`          | `sll dest, src, src2`               | Shift `src` left by `src2` bits, store result in `dest` |
 | `srl`          | `srl dest, src1, src2`              | Shift `src` right by `src2` bits, store result in `dest` |
-
 | `beq`          | `beq src1, src2, label`             | Branch if `src1` is equal to `src2`, to `label`  |
 | `bneq`         | `bneq src1, src2, label`            | Branch if `src1` is not equal to `src2`, to `label` |
-
 | `sw`           | `sw src, offset(base)`              | Store word from `src` to memory at address `base + offset` |
 | `lw`           | `lw dest, offset(base)`             | Load word from memory at address `base + offset` into `dest` |
-
 | `j`            | `j label`                           | Jump to address `label`                                 |
 
 
@@ -105,8 +100,8 @@ Here `dest`, `src1`, `src2`, `base` are all registers. `imm` is an 8-bit signed 
 ### Extended I/O Functionality
 The extended MIPS processor supports the following I/O peripherals:
 
-| IO Port | Functionality                     |
-|---------|-----------------------------------|
+| IO Port | Functionality                    |
+|---------|----------------------------------|
 | 0       | X Enable + Data                  |
 | 1       | Y Enable + Data                  |
 | 2       | Update Flag                      |
@@ -119,6 +114,9 @@ The extended MIPS processor supports the following I/O peripherals:
 | 15      | Random Input                     |
 
 *How to use I/O peripherals:*
+
+I/O peripherals are just re-mapped memory addresses. So they can be accessed just by lw (load word) and sw (save word) instruction which saves and loads a value from a memory address. 
+To make using them easier the base address of all I/O peripheral is stored in $io register. Just by adding the I/O port number as offset any peripheral can be accessed easily. Examble below:
 
 To output data of `$t0` to a peripheral at port 1 use `lw $t0, 1($io)`
 
