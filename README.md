@@ -98,8 +98,8 @@ The MIPS processor supports the following instructions:
 ### Extended I/O Functionality
 The extended MIPS processor supports the following I/O peripherals:
 
-| IO Port | Functionality                     |
-|---------|-----------------------------------|
+| IO Port | Functionality                    |
+|---------|----------------------------------|
 | 0       | X Enable + Data                  |
 | 1       | Y Enable + Data                  |
 | 2       | Update Flag                      |
@@ -112,6 +112,9 @@ The extended MIPS processor supports the following I/O peripherals:
 | 15      | Random Input                     |
 
 *How to use I/O peripherals:*
+
+I/O peripherals are just re-mapped memory addressed. So they can be accessed just by lw (load word) and sw (save word) instruction which saves and loads a value from a memory address. 
+To make using them easier the base address of all I/O peripheral is stored in $io register. Just by adding the I/O port number as offset any peripheral can be accessed easily. Examble below:
 
 To output data of `$t0` to a peripheral at port 1 use `lw $t0, 1($io)`
 
