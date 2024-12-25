@@ -17,11 +17,11 @@ This repository contains an 8-bit MIPS (Microprocessor without Interlocked Pipel
 ![SnakeGame](https://media.giphy.com/media/VleEIiyLuSroiPZBTy/giphy.gif)
 -->
 
-### Classical Tetris Game
+### Classical Tetris Game (Sped Up)
 
 [Assembly code of the game](ASSEMBLY/TETRIS_GAME.mips)
 
-***Will add animation soon***
+<img src="https://github.com/JonayedMohiuddin/8bit-PIPELINED-MIPS/blob/main/IMAGES/TETRIS_GAME_DEMO_MIPS.gif" width="500" height="auto">
 
 ### Hello World with Counter
 
@@ -119,7 +119,11 @@ To get input in `$t0` from a peripheral at port 4 use `sw $t0, 4($io)`
 
 ---
 
+## Pipelined Version
 
+MIPS is microprocessor without interlocked pipelined stages, so it is easy to implement pipelining in MIPS. **Pipelining** in processors is a technique used to improve the throughput of a CPU by overlapping the execution of instructions. Instead of processing one instruction at a time, pipelining breaks down the execution of instructions into discrete stages. MIPS was divided into 5 stages namely IF (Instruction Fetch), ID (Instruction Decode), EX (Execution), MEM (Memory), WB (Write-Back). 
+
+One of the challenges in pipelined execution is handling of **hazards**. Data Hazard (RAW - Read After Write) and Control Hazard (Branching and Jumps) is mainly problematic for MIPS and was handled properly by using Data Forwarding, Stalling when necessary and Flushing registers. Structural Hazard and other hazards (WAR, WAW) was not an issue for MIPS.
 
 ## How to Use
 
@@ -143,25 +147,14 @@ To get input in `$t0` from a peripheral at port 4 use `sw $t0, 4($io)`
 
 ---
 
-### Snake Game
-This repository includes a playable **Snake Game** written in MIPS assembly. To play:
+## Major Limitations
 
-1. Assemble `SNAKE_GAME.mips` using the assembler.
-2. Load the generated binary file into the **Instruction ROM**.
-3. Start simulation and set tick speed to 4.1 kHz. Enable tick and enjoy.
-
----
-
-### Major Limitations
-
-1. Only 8 bit instruction memory allows 256 lines of instruction so cannot write large complex programs.
+1. Only 8 bit instruction memory allows 256 lines of instruction so cannot write large and complex programs.
 2. Lack of the 'jal' instruction makes life so much harder. Without jal cannot use any procedure calling as usage of jump forces to return to the same spot. Defeating the advantage of using a procedure.
 3. Slow simulation of logisim makes it boring (yes logisim's 4.1kHz is slow)
+
+---
 
 ## License
 This project is licensed under the MIT License. See the `LICENSE` file for more details.
 
----
-
-## Acknowledgments
-Special thanks to the course instructors for their guidance and support in building this project.
