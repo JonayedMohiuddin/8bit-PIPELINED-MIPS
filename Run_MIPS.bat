@@ -4,8 +4,8 @@ echo Logisim might give "The required library file 'ALUjar' is missing. Please s
 echo Choose a circuit to run:
 echo 1. MIPS
 echo 2. Pipelined MIPS
-echo 3. Extended IO MIPS
-echo 4. Extended IO Pipelined MIPS
+echo 3. Extended IO MIPS            (Can run snake, tetris demos)
+echo 4. Extended IO Pipelined MIPS  (Can run snake, tetris demos)
 
 :: Get the user input
 set /p choice="Enter your choice (1-4): "
